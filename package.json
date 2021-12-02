@@ -78,5 +78,9 @@
     "rollup": "2.60.2",
     "rollup-plugin-auto-external": "2.0.0",
     "sinon": "12.0.1"
+  },
+  "dependencies": {
+    "@form8ion/javascript-core": "^4.0.0",
+    "deepmerge": "^4.2.2"
   }
 }
