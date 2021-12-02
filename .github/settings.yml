@@ -1,0 +1,6 @@
+_extends: .github
+repository:
+  name: commit-convention
+  description: form8ion plugin for managing tools related to commit conventions
+  homepage: https://npm.im/@form8ion/commit-convention
+  private: false
