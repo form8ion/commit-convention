@@ -6,7 +6,7 @@ import {assert} from 'chai';
 
 import * as commitizenScaffolder from './commitizen';
 import * as commitlintScaffolder from './commitlint';
-import scaffoldCommitConvention from './index';
+import scaffoldCommitConvention from './scaffolder';
 
 suite('commit-convention scaffolder', () => {
   let sandbox;

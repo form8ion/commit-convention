@@ -3,9 +3,3 @@ extends:
   - '@form8ion'
   - '@form8ion/cucumber'
   - '@form8ion/mocha'
-
-rules:
-  no-restricted-exports:
-    - error
-    - restrictedNamedExports:
-      - then
