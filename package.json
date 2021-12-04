@@ -45,7 +45,8 @@
     "prepack": "run-s build",
     "test:unit": "cross-env NODE_ENV=test c8 run-s test:unit:base",
     "test:unit:base": "DEBUG=any mocha 'src/**/*-test.js'",
-    "lint:peer": "npm ls >/dev/null"
+    "lint:peer": "npm ls >/dev/null",
+    "coverage:report": "c8 report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
     "@babel/register": "7.16.0",
@@ -62,6 +63,7 @@
     "ban-sensitive-files": "1.9.16",
     "c8": "7.10.0",
     "chai": "4.3.4",
+    "codecov": "3.8.3",
     "cross-env": "7.0.3",
     "cz-conventional-changelog": "3.3.0",
     "gherkin-lint": "4.2.2",
@@ -78,5 +80,9 @@
     "rollup": "2.60.2",
     "rollup-plugin-auto-external": "2.0.0",
     "sinon": "12.0.1"
+  },
+  "dependencies": {
+    "@form8ion/javascript-core": "^4.0.0",
+    "deepmerge": "^4.2.2"
   }
 }
