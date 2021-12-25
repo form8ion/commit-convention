@@ -1,9 +1,11 @@
+import deepmerge from 'deepmerge';
 import {projectTypes} from '@form8ion/javascript-core';
 
 import sinon from 'sinon';
 import any from '@travi/any';
 import {assert} from 'chai';
 
+import * as semanticReleaseScaffolder from './semantic-release/scaffolder';
 import * as commitizenScaffolder from './commitizen';
 import * as commitlintScaffolder from './commitlint';
 import scaffoldCommitConvention from './scaffolder';
@@ -12,31 +14,26 @@ suite('commit-convention scaffolder', () => {
   let sandbox;
   const projectRoot = any.string();
   const packageManager = any.word();
-  const commitizenScripts = any.simpleObject();
-  const commitizenDevDependencies = any.listOf(any.string);
   const publishedProjectType = any.fromList([projectTypes.PACKAGE, projectTypes.CLI]);
-  const contributionBadges = {
-    'commit-convention': {
-      img: 'https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg',
-      text: 'Conventional Commits',
-      link: 'https://conventionalcommits.org'
-    }
-  };
-  const semanticReleaseBadge = {
-    img: 'https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release',
-    text: 'semantic-release: angular',
-    link: 'https://github.com/semantic-release/semantic-release'
+  const mergedResults = any.simpleObject();
+  const commitizenResults = any.simpleObject();
+  const semanticReleaseResults = any.simpleObject();
+  const conventionalCommitsBadge = {
+    img: 'https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg',
+    text: 'Conventional Commits',
+    link: 'https://conventionalcommits.org'
   };
 
   setup(() => {
     sandbox = sinon.createSandbox();
 
+    sandbox.stub(deepmerge, 'all');
     sandbox.stub(commitlintScaffolder, 'default');
     sandbox.stub(commitizenScaffolder, 'default');
+    sandbox.stub(semanticReleaseScaffolder, 'default');
 
-    commitizenScaffolder.default
-      .withArgs({projectRoot})
-      .resolves({devDependencies: commitizenDevDependencies, scripts: commitizenScripts});
+    commitizenScaffolder.default.withArgs({projectRoot}).resolves(commitizenResults);
+    semanticReleaseScaffolder.default.returns(semanticReleaseResults);
   });
 
   teardown(() => sandbox.restore());
@@ -51,53 +48,66 @@ suite('commit-convention scaffolder', () => {
         pathWithinParent: any.string(),
         projectType: publishedProjectType
       }),
-      {
-        packageProperties: {version: '0.0.0-semantically-released'},
-        badges: {contribution: {'semantic-release': semanticReleaseBadge}}
-      }
+      semanticReleaseResults
     );
   });
 
   test('that the convention is configured', async () => {
     const commitlintConfig = any.simpleObject();
-    const commitlintDevDependencies = any.listOf(any.string);
-    commitlintScaffolder.default
-      .withArgs({projectRoot, config: commitlintConfig})
-      .resolves({devDependencies: commitlintDevDependencies});
+    const commitlintResults = any.simpleObject();
+    commitlintScaffolder.default.withArgs({projectRoot, config: commitlintConfig}).resolves(commitlintResults);
+    deepmerge.all
+      .withArgs([
+        commitizenResults,
+        commitlintResults,
+        {
+          vcsIgnore: {files: [], directories: []},
+          badges: {contribution: {'commit-convention': conventionalCommitsBadge}}
+        },
+        {}
+      ])
+      .returns(mergedResults);
 
-    assert.deepEqual(
+    assert.equal(
       await scaffoldCommitConvention({projectRoot, packageManager, configs: {commitlint: commitlintConfig}}),
-      {
-        devDependencies: [...commitizenDevDependencies, ...commitlintDevDependencies],
-        scripts: commitizenScripts,
-        vcsIgnore: {files: [], directories: []},
-        badges: {contribution: contributionBadges}
-      }
+      mergedResults
     );
   });
 
   test('that commitlint is not configured if no config is provided', async () => {
+    deepmerge.all
+      .withArgs([
+        commitizenResults,
+        {
+          vcsIgnore: {files: [], directories: []},
+          badges: {contribution: {'commit-convention': conventionalCommitsBadge}}
+        },
+        {}
+      ])
+      .returns(mergedResults);
+
     assert.deepEqual(
       await scaffoldCommitConvention({projectRoot, configs: {}, packageManager}),
-      {
-        devDependencies: commitizenDevDependencies,
-        scripts: commitizenScripts,
-        vcsIgnore: {files: [], directories: []},
-        badges: {contribution: contributionBadges}
-      }
+      mergedResults
     );
     assert.notCalled(commitlintScaffolder.default);
   });
 
   test('that semantic-release is configured for packages', async () => {
-    const {badges, packageProperties} = await scaffoldCommitConvention({
-      projectRoot,
-      projectType: publishedProjectType,
-      configs: {},
-      packageManager
-    });
+    deepmerge.all
+      .withArgs([
+        commitizenResults,
+        {
+          vcsIgnore: {files: [], directories: []},
+          badges: {contribution: {'commit-convention': conventionalCommitsBadge}}
+        },
+        semanticReleaseResults
+      ])
+      .returns(mergedResults);
 
-    assert.equal(packageProperties.version, '0.0.0-semantically-released');
-    assert.deepEqual(badges.contribution['semantic-release'], semanticReleaseBadge);
+    assert.deepEqual(
+      await scaffoldCommitConvention({projectRoot, projectType: publishedProjectType, configs: {}, packageManager}),
+      mergedResults
+    );
   });
 });

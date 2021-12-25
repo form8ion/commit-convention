@@ -1,22 +1,14 @@
 import deepmerge from 'deepmerge';
 import {projectTypes} from '@form8ion/javascript-core';
 
+import {scaffold as scaffoldSemanticRelease} from './semantic-release';
 import scaffoldCommitizen from './commitizen';
 import scaffoldCommitlint from './commitlint';
 
 export default async function ({projectRoot, projectType, configs, pathWithinParent}) {
-  const detailsForProjectsPublishedToARegistry = [projectTypes.PACKAGE, projectTypes.CLI].includes(projectType) ? {
-    packageProperties: {version: '0.0.0-semantically-released'},
-    badges: {
-      contribution: {
-        'semantic-release': {
-          img: 'https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release',
-          text: 'semantic-release: angular',
-          link: 'https://github.com/semantic-release/semantic-release'
-        }
-      }
-    }
-  } : {};
+  const detailsForProjectsPublishedToARegistry = [projectTypes.PACKAGE, projectTypes.CLI].includes(projectType)
+    ? scaffoldSemanticRelease()
+    : {};
 
   if (pathWithinParent) return detailsForProjectsPublishedToARegistry;
 
