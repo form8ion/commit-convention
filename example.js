@@ -1,13 +1,20 @@
 // #### Import
 // remark-usage-ignore-next
 import stubbedFs from 'mock-fs';
-import {scaffold} from './lib/index.cjs';
+import {packageManagers} from '@form8ion/javascript-core';
+import {scaffold, test, lift} from './lib/index.cjs';
 
 // remark-usage-ignore-next
-stubbedFs();
+stubbedFs({'package.json': JSON.stringify({version: '0.0.0-semantically-released'})});
 
 // #### Execute
 
 (async () => {
-  await scaffold({projectRoot: process.cwd(), configs: {}});
+  const projectRoot = process.cwd();
+
+  await scaffold({projectRoot, configs: {}});
+
+  if (await test({projectRoot})) {
+    await lift({projectRoot, packageManager: packageManagers.NPM});
+  }
 })();

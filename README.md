@@ -41,14 +41,21 @@ $ npm install @form8ion/commit-convention --save-prod
 #### Import
 
 ```javascript
-import {scaffold} from '@form8ion/commit-convention';
+import {packageManagers} from '@form8ion/javascript-core';
+import {scaffold, test, lift} from '@form8ion/commit-convention';
 ```
 
 #### Execute
 
 ```javascript
 (async () => {
-  await scaffold({projectRoot: process.cwd(), configs: {}});
+  const projectRoot = process.cwd();
+
+  await scaffold({projectRoot, configs: {}});
+
+  if (await test({projectRoot})) {
+    await lift({projectRoot, packageManager: packageManagers.NPM});
+  }
 })();
 ```
 
