@@ -28,7 +28,10 @@ When('the project is lifted', async function () {
 
   stubbedFs({
     node_modules: stubbedNodeModules,
-    'package.json': JSON.stringify({...any.simpleObject()})
+    'package.json': JSON.stringify({
+      ...any.simpleObject(),
+      ...this.semanticReleaseConfigured && {version: '0.0.0-semantically-released'}
+    })
   });
 
   if (await test({projectRoot})) {
