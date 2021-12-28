@@ -4,3 +4,4 @@ Feature: Lift
     Given semantic-release is configured
     And legacy releases are configured in a GitHub workflow
     When the project is lifted
+    Then the release workflow if defined

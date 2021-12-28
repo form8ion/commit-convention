@@ -27,6 +27,7 @@ When('the project is lifted', async function () {
   const {test, lift} = require('@form8ion/commit-convention');
 
   stubbedFs({
+    ...this.semanticReleaseGithubWorkflow && {'.github': {workflows: {}}},
     node_modules: stubbedNodeModules,
     'package.json': JSON.stringify({
       ...any.simpleObject(),
