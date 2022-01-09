@@ -54,7 +54,7 @@ import {scaffold, test, lift} from '@form8ion/commit-convention';
   await scaffold({projectRoot, configs: {}});
 
   if (await test({projectRoot})) {
-    await lift({projectRoot, packageManager: packageManagers.NPM});
+    await lift({projectRoot, packageManager: packageManagers.NPM, vcs: {owner: 'foo', name: 'bar'}});
   }
 })();
 ```

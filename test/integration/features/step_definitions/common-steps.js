@@ -1,4 +1,5 @@
 import {resolve} from 'path';
+import {dump} from 'js-yaml';
 
 import {After, When} from '@cucumber/cucumber';
 import stubbedFs from 'mock-fs';
@@ -26,8 +27,31 @@ When('the project is lifted', async function () {
   // eslint-disable-next-line import/no-extraneous-dependencies,import/no-unresolved
   const {test, lift} = require('@form8ion/commit-convention');
 
+  this.projectName = any.word();
+  this.vcsOwner = any.word();
+
   stubbedFs({
-    ...this.semanticReleaseGithubWorkflow && {'.github': {workflows: {}}},
+    ...this.githubWorkflows && {
+      '.github': {
+        workflows: {
+          ...this.verificationWorkflow && {
+            'node-ci.yml': dump({
+              jobs: {
+                ...this.nodeCiWithReleaseJob && {
+                  release: {}
+                },
+                ...this.nodeCiWithTriggerReleaseJob && {
+                  'trigger-release': {}
+                }
+              }
+            })
+          },
+          ...this.releaseWorkflow && {
+            'release.yml': dump({})
+          }
+        }
+      }
+    },
     node_modules: stubbedNodeModules,
     'package.json': JSON.stringify({
       ...any.simpleObject(),
@@ -36,6 +60,6 @@ When('the project is lifted', async function () {
   });
 
   if (await test({projectRoot})) {
-    await lift({projectRoot});
+    await lift({projectRoot, vcs: {owner: this.vcsOwner, name: this.projectName}});
   }
 });

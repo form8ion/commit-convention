@@ -27,9 +27,10 @@ suite('semantic-release lifter', () => {
   });
 
   test('that the ci provider is lifted when supported', async () => {
+    const vcsDetails = any.simpleObject();
     githubWorkflowsTester.default.withArgs({projectRoot}).resolves(true);
 
-    assert.deepEqual(await lift({projectRoot}), {});
-    assert.calledWith(githubWorkflowsLifter.default, {projectRoot});
+    assert.deepEqual(await lift({projectRoot, vcs: vcsDetails}), {});
+    assert.calledWith(githubWorkflowsLifter.default, {projectRoot, vcs: vcsDetails});
   });
 });
