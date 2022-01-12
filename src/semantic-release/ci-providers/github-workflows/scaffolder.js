@@ -5,6 +5,7 @@ export default async function ({projectRoot}) {
   await fs.writeFile(
     `${projectRoot}/.github/workflows/release.yml`,
     dump({
+      name: 'Release',
       on: {push: {branches: ['alpha']}, workflow_dispatch: {}},
       env: {FORCE_COLOR: 1, NPM_CONFIG_COLOR: 'always'},
       jobs: {
