@@ -25,6 +25,8 @@ Given('no release is configured in a GitHub workflow', async function () {
   this.verificationWorkflow = true;
   this.nodeCiWithReleaseJob = false;
   this.nodeCiWithTriggerReleaseJob = false;
+  this.alphaBranchTrigger = false;
+  this.betaBranchTrigger = false;
 });
 
 Given('no GitHub workflows exist', async function () {
@@ -44,8 +46,11 @@ Then('the verification workflow triggers the release workflow', async function (
     `${process.cwd()}/.github/workflows/node-ci.yml`,
     'utf-8'
   ));
+  const branchTriggers = verificationWorkflowDefinition.on.push.branches;
 
-  assert.deepEqual(verificationWorkflowDefinition.on.push.branches, ['master', 'beta', 'dependency-updater/**']);
+  assert.include(branchTriggers, 'master');
+  assert.include(branchTriggers, 'beta');
+  assert.include(branchTriggers, 'dependency-updater/**');
 
   const verificationWorkflowJobs = verificationWorkflowDefinition.jobs;
   const triggerReleaseJob = verificationWorkflowJobs['trigger-release'];

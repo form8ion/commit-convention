@@ -13,9 +13,10 @@ export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: 
 
   const parsedVerificationWorkflowDetails = load(await fs.readFile(pathToVerificationWorkflow, 'utf-8'));
 
-  parsedVerificationWorkflowDetails.on.push.branches = parsedVerificationWorkflowDetails.on.push.branches.filter(
-    branch => 'alpha' !== branch
-  );
+  parsedVerificationWorkflowDetails.on.push.branches = [
+    ...parsedVerificationWorkflowDetails.on.push.branches.filter(branch => 'alpha' !== branch),
+    ...!parsedVerificationWorkflowDetails.on.push.branches.includes('beta') ? ['beta'] : []
+  ];
 
   const {release, ...otherJobs} = parsedVerificationWorkflowDetails.jobs;
   parsedVerificationWorkflowDetails.jobs = {

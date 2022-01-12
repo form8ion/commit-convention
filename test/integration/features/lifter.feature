@@ -14,6 +14,13 @@ Feature: Lift
     Then the release workflow is defined
 
   Scenario: no existing release
+    Given semantic-release is configured
+    And no release is configured in a GitHub workflow
+    When the project is lifted
+    Then the release workflow is defined
+    And the verification workflow triggers the release workflow
+
+  Scenario: no release needed
     Given semantic-release is not configured
     And no release is configured in a GitHub workflow
     When the project is lifted

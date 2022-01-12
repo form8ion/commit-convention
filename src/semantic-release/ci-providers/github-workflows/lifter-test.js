@@ -64,13 +64,61 @@ suite('github-workflows lifter for semantic-release', () => {
       .withArgs(verificationWorkflowContents)
       .returns({
         ...parsedVerificationWorkflowContents,
-        on: {push: {branches: [...branchTriggers, 'alpha', ...moreBranchTriggers]}},
+        on: {push: {branches: [...branchTriggers, 'alpha', 'beta', ...moreBranchTriggers]}},
         jobs: {...jobs, release: legacyReleaseJob}
       });
     jsYaml.dump
       .withArgs({
         ...parsedVerificationWorkflowContents,
+        on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
+        jobs: {
+          ...jobs,
+          'trigger-release': {
+            'runs-on': 'ubuntu-latest',
+            if: "github.event_name == 'push'",
+            steps: [{
+              uses: 'octokit/request-action@v2.x',
+              with: {
+                route: 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
+                owner: vcsOwner,
+                repo: vcsName,
+                ref: '${{ github.ref }}',                       // eslint-disable-line no-template-curly-in-string
+                workflow_id: 'release.yml'
+              },
+              env: {
+                GITHUB_TOKEN: '${{ secrets.GH_PAT }}'         // eslint-disable-line no-template-curly-in-string
+              }
+            }]
+          }
+        }
+      })
+      .returns(updatedVerificationWorkflowContents);
+
+    await lift({projectRoot, vcs: vcsDetails});
+
+    assert.calledWith(fs.writeFile, `${workflowsDirectory}/node-ci.yml`, updatedVerificationWorkflowContents);
+  });
+
+  test('that the the release trigger is added when no release is configured yet', async () => {
+    const verificationWorkflowContents = any.string();
+    const parsedVerificationWorkflowContents = any.simpleObject();
+    const jobs = any.simpleObject();
+    const updatedVerificationWorkflowContents = any.string();
+    const branchTriggers = any.listOf(any.word);
+    const moreBranchTriggers = any.listOf(any.word);
+    core.fileExists.resolves(true);
+    fs.readFile.withArgs(`${workflowsDirectory}/node-ci.yml`, 'utf-8').resolves(verificationWorkflowContents);
+    jsYaml.load
+      .withArgs(verificationWorkflowContents)
+      .returns({
+        ...parsedVerificationWorkflowContents,
         on: {push: {branches: [...branchTriggers, ...moreBranchTriggers]}},
+        jobs
+      });
+    jsYaml.dump
+      .withArgs({
+        ...parsedVerificationWorkflowContents,
+        on: {push: {branches: [...branchTriggers, ...moreBranchTriggers, 'beta']}},
         jobs: {
           ...jobs,
           'trigger-release': {
