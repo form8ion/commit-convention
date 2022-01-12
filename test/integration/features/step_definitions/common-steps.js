@@ -36,6 +36,16 @@ When('the project is lifted', async function () {
         workflows: {
           ...this.verificationWorkflow && {
             'node-ci.yml': dump({
+              on: {
+                push: {
+                  branches: [
+                    'master',
+                    ...this.alphaBranchTrigger ? ['alpha'] : [],
+                    ...this.betaBranchTrigger ? ['beta'] : [],
+                    'dependency-updater/**'
+                  ]
+                }
+              },
               jobs: {
                 ...this.nodeCiWithReleaseJob && {
                   release: {}

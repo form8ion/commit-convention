@@ -29,7 +29,7 @@ suite('github-workflows lifter for semantic-release', () => {
 
     const commonVerificationWorkflowContents = any.string();
     fs.readFile.withArgs(`${workflowsDirectory}/node-ci.yml`, 'utf-8').resolves(commonVerificationWorkflowContents);
-    jsYaml.load.withArgs(commonVerificationWorkflowContents).returns({jobs: {}});
+    jsYaml.load.withArgs(commonVerificationWorkflowContents).returns({on: {push: {branches: []}}, jobs: {}});
   });
 
   teardown(() => sandbox.restore());
@@ -56,14 +56,21 @@ suite('github-workflows lifter for semantic-release', () => {
     const jobs = any.simpleObject();
     const legacyReleaseJob = any.simpleObject();
     const updatedVerificationWorkflowContents = any.string();
+    const branchTriggers = any.listOf(any.word);
+    const moreBranchTriggers = any.listOf(any.word);
     core.fileExists.resolves(true);
     fs.readFile.withArgs(`${workflowsDirectory}/node-ci.yml`, 'utf-8').resolves(verificationWorkflowContents);
     jsYaml.load
       .withArgs(verificationWorkflowContents)
-      .returns({...parsedVerificationWorkflowContents, jobs: {...jobs, release: legacyReleaseJob}});
+      .returns({
+        ...parsedVerificationWorkflowContents,
+        on: {push: {branches: [...branchTriggers, 'alpha', ...moreBranchTriggers]}},
+        jobs: {...jobs, release: legacyReleaseJob}
+      });
     jsYaml.dump
       .withArgs({
         ...parsedVerificationWorkflowContents,
+        on: {push: {branches: [...branchTriggers, ...moreBranchTriggers]}},
         jobs: {
           ...jobs,
           'trigger-release': {

@@ -1,5 +1,5 @@
 import {promises as fs} from 'fs';
-import {load, dump} from 'js-yaml';
+import {dump, load} from 'js-yaml';
 import {fileExists} from '@form8ion/core';
 
 import scaffoldReleaseWorkflow from './scaffolder';
@@ -12,6 +12,11 @@ export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: 
   }
 
   const parsedVerificationWorkflowDetails = load(await fs.readFile(pathToVerificationWorkflow, 'utf-8'));
+
+  parsedVerificationWorkflowDetails.on.push.branches = parsedVerificationWorkflowDetails.on.push.branches.filter(
+    branch => 'alpha' !== branch
+  );
+
   const {release, ...otherJobs} = parsedVerificationWorkflowDetails.jobs;
   parsedVerificationWorkflowDetails.jobs = {
     ...otherJobs,

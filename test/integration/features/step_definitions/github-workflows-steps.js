@@ -9,6 +9,8 @@ Given('legacy releases are configured in a GitHub workflow', async function () {
   this.githubWorkflows = true;
   this.verificationWorkflow = true;
   this.nodeCiWithReleaseJob = true;
+  this.alphaBranchTrigger = true;
+  this.betaBranchTrigger = true;
 });
 
 Given('modern releases are configured in a GitHub workflow', async function () {
@@ -42,6 +44,8 @@ Then('the verification workflow triggers the release workflow', async function (
     `${process.cwd()}/.github/workflows/node-ci.yml`,
     'utf-8'
   ));
+
+  assert.deepEqual(verificationWorkflowDefinition.on.push.branches, ['master', 'beta', 'dependency-updater/**']);
 
   const verificationWorkflowJobs = verificationWorkflowDefinition.jobs;
   const triggerReleaseJob = verificationWorkflowJobs['trigger-release'];
