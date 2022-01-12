@@ -25,13 +25,12 @@ export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: 
           owner: vcsOwner,
           repo: vcsProjectName,
           ref: '${{ github.ref }}',                       // eslint-disable-line no-template-curly-in-string
-          workflow_id: 'release.yml',
-          env: {
-            GITHUB_TOKEN: '${{ secrets.GH_PAT }}'         // eslint-disable-line no-template-curly-in-string
-          }
+          workflow_id: 'release.yml'
+        },
+        env: {
+          GITHUB_TOKEN: '${{ secrets.GH_PAT }}'         // eslint-disable-line no-template-curly-in-string
         }
       }]
-
     }
   };
 
