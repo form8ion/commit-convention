@@ -47,6 +47,7 @@ When('the project is lifted', async function () {
                 }
               },
               jobs: {
+                verify: {},
                 ...this.nodeCiWithReleaseJob && {
                   release: {}
                 },

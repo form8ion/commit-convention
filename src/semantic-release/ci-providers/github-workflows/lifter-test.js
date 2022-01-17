@@ -16,6 +16,13 @@ suite('github-workflows lifter for semantic-release', () => {
   const vcsName = any.word();
   const vcsOwner = any.word();
   const vcsDetails = {name: vcsName, owner: vcsOwner};
+  const verificationWorkflowContents = any.string();
+  const parsedVerificationWorkflowContents = any.simpleObject();
+  const jobs = any.simpleObject();
+  const legacyReleaseJob = any.simpleObject();
+  const updatedVerificationWorkflowContents = any.string();
+  const branchTriggers = any.listOf(any.word);
+  const moreBranchTriggers = any.listOf(any.word);
 
   setup(() => {
     sandbox = sinon.createSandbox();
@@ -51,13 +58,6 @@ suite('github-workflows lifter for semantic-release', () => {
   });
 
   test('that the legacy release job is removed', async () => {
-    const verificationWorkflowContents = any.string();
-    const parsedVerificationWorkflowContents = any.simpleObject();
-    const jobs = any.simpleObject();
-    const legacyReleaseJob = any.simpleObject();
-    const updatedVerificationWorkflowContents = any.string();
-    const branchTriggers = any.listOf(any.word);
-    const moreBranchTriggers = any.listOf(any.word);
     core.fileExists.resolves(true);
     fs.readFile.withArgs(`${workflowsDirectory}/node-ci.yml`, 'utf-8').resolves(verificationWorkflowContents);
     jsYaml.load
@@ -76,6 +76,7 @@ suite('github-workflows lifter for semantic-release', () => {
           'trigger-release': {
             'runs-on': 'ubuntu-latest',
             if: "github.event_name == 'push'",
+            needs: ['verify'],
             steps: [{
               uses: 'octokit/request-action@v2.x',
               with: {
@@ -100,12 +101,6 @@ suite('github-workflows lifter for semantic-release', () => {
   });
 
   test('that the the release trigger is added when no release is configured yet', async () => {
-    const verificationWorkflowContents = any.string();
-    const parsedVerificationWorkflowContents = any.simpleObject();
-    const jobs = any.simpleObject();
-    const updatedVerificationWorkflowContents = any.string();
-    const branchTriggers = any.listOf(any.word);
-    const moreBranchTriggers = any.listOf(any.word);
     core.fileExists.resolves(true);
     fs.readFile.withArgs(`${workflowsDirectory}/node-ci.yml`, 'utf-8').resolves(verificationWorkflowContents);
     jsYaml.load
@@ -124,6 +119,7 @@ suite('github-workflows lifter for semantic-release', () => {
           'trigger-release': {
             'runs-on': 'ubuntu-latest',
             if: "github.event_name == 'push'",
+            needs: ['verify'],
             steps: [{
               uses: 'octokit/request-action@v2.x',
               with: {

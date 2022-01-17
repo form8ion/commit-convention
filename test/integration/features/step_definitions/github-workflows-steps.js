@@ -57,6 +57,7 @@ Then('the verification workflow triggers the release workflow', async function (
 
   assert.isUndefined(verificationWorkflowJobs.release);
   assert.equal(triggerReleaseJob.if, "github.event_name == 'push'");
+  assert.deepEqual(triggerReleaseJob.needs, ['verify']);
 
   const releaseTriggerRequest = triggerReleaseJob.steps[0];
   assert.equal(releaseTriggerRequest.uses, 'octokit/request-action@v2.x');
@@ -75,4 +76,14 @@ Then('the verification workflow does not trigger the release workflow', async fu
   ));
 
   assert.isUndefined(verificationWorkflowDefinition.jobs['trigger-release']);
+});
+
+Then('the release is not triggered until verification completes', async function () {
+  const verificationWorkflowDefinition = load(await fs.readFile(
+    `${process.cwd()}/.github/workflows/node-ci.yml`,
+    'utf-8'
+  ));
+  const triggerReleaseJob = verificationWorkflowDefinition.jobs['trigger-release'];
+
+  assert.include(triggerReleaseJob.needs, 'verify');
 });

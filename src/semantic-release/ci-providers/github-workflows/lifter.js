@@ -24,6 +24,7 @@ export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: 
     'trigger-release': {
       'runs-on': 'ubuntu-latest',
       if: "github.event_name == 'push'",
+      needs: ['verify'],
       steps: [{
         uses: 'octokit/request-action@v2.x',
         with: {
@@ -34,7 +35,7 @@ export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: 
           workflow_id: 'release.yml'
         },
         env: {
-          GITHUB_TOKEN: '${{ secrets.GH_PAT }}'         // eslint-disable-line no-template-curly-in-string
+          GITHUB_TOKEN: '${{ secrets.GH_PAT }}'           // eslint-disable-line no-template-curly-in-string
         }
       }]
     }
