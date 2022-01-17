@@ -29,6 +29,10 @@ Given('no release is configured in a GitHub workflow', async function () {
   this.betaBranchTrigger = false;
 });
 
+Given('multiple node versions are verified', async function () {
+  this.multipleNodeVersionsVerified = true;
+});
+
 Given('no GitHub workflows exist', async function () {
   this.githubWorkflows = false;
 });
@@ -86,4 +90,5 @@ Then('the release is not triggered until verification completes', async function
   const triggerReleaseJob = verificationWorkflowDefinition.jobs['trigger-release'];
 
   assert.include(triggerReleaseJob.needs, 'verify');
+  if (this.multipleNodeVersionsVerified) assert.include(triggerReleaseJob.needs, 'verify-matrix');
 });

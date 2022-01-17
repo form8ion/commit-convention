@@ -2,6 +2,7 @@ import {promises as fs} from 'fs';
 import {dump, load} from 'js-yaml';
 import {fileExists} from '@form8ion/core';
 
+import determineTriggerNeedsFrom from './release-trigger-needs';
 import scaffoldReleaseWorkflow from './scaffolder';
 
 export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: vcsOwner}}) {
@@ -24,7 +25,7 @@ export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: 
     'trigger-release': {
       'runs-on': 'ubuntu-latest',
       if: "github.event_name == 'push'",
-      needs: ['verify'],
+      needs: determineTriggerNeedsFrom(parsedVerificationWorkflowDetails.jobs),
       steps: [{
         uses: 'octokit/request-action@v2.x',
         with: {

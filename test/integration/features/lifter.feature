@@ -20,6 +20,14 @@ Feature: Lift
     Then the release workflow is defined
     And the release is not triggered until verification completes
 
+  Scenario: modern semantic-release in GitHub workflows verifying multiple node versions, but trigger does not wait for verification
+    Given semantic-release is configured
+    And modern releases are configured in a GitHub workflow
+    And multiple node versions are verified
+    When the project is lifted
+    Then the release workflow is defined
+    And the release is not triggered until verification completes
+
   Scenario: no existing release
     Given semantic-release is configured
     And no release is configured in a GitHub workflow

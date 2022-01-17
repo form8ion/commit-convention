@@ -48,12 +48,9 @@ When('the project is lifted', async function () {
               },
               jobs: {
                 verify: {},
-                ...this.nodeCiWithReleaseJob && {
-                  release: {}
-                },
-                ...this.nodeCiWithTriggerReleaseJob && {
-                  'trigger-release': {}
-                }
+                ...this.multipleNodeVersionsVerified && {'verify-matrix': {}},
+                ...this.nodeCiWithReleaseJob && {release: {}},
+                ...this.nodeCiWithTriggerReleaseJob && {'trigger-release': {}}
               }
             })
           },
