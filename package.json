@@ -4,6 +4,9 @@
   "license": "MIT",
   "type": "commonjs",
   "version": "0.0.0-semantically-released",
+  "engines": {
+    "node": "^14.15 || >=16"
+  },
   "files": [
     "example.js",
     "lib/"
