@@ -27,6 +27,7 @@ form8ion plugin for managing tools related to commit conventions
 [![MIT license][license-badge]][license-link]
 [![npm][npm-badge]][npm-link]
 [![Try @form8ion/commit-convention on RunKit][runkit-badge]][runkit-link]
+![node][node-badge]
 
 <!--consumer-badges end -->
 
@@ -123,3 +124,5 @@ $ npm test
 [coverage-link]: https://codecov.io/github/form8ion/commit-convention
 
 [coverage-badge]: https://img.shields.io/codecov/c/github/form8ion/commit-convention.svg
+
+[node-badge]: https://img.shields.io/node/v/@form8ion/commit-convention?logo=node.js
