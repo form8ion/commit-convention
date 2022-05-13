@@ -1,5 +1,10 @@
 import {promises as fs} from 'fs';
 import {dump} from 'js-yaml';
+import {
+  scaffoldCheckoutStep,
+  scaffoldNodeSetupStep,
+  scaffoldDependencyInstallationStep
+} from '@form8ion/github-workflows-core';
 
 export default async function ({projectRoot}) {
   await fs.writeFile(
@@ -12,13 +17,9 @@ export default async function ({projectRoot}) {
         release: {
           'runs-on': 'ubuntu-latest',
           steps: [
-            {uses: 'actions/checkout@v3'},
-            {
-              name: 'Setup node',
-              uses: 'actions/setup-node@v3',
-              with: {'node-version-file': '.nvmrc', cache: 'npm'}
-            },
-            {run: 'npm clean-install'},
+            scaffoldCheckoutStep(),
+            scaffoldNodeSetupStep({versionDeterminedBy: 'nvmrc'}),
+            scaffoldDependencyInstallationStep(),
             {
               name: 'semantic-release',
               run: 'npx semantic-release',
