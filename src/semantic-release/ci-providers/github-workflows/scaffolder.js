@@ -12,10 +12,10 @@ export default async function ({projectRoot}) {
         release: {
           'runs-on': 'ubuntu-latest',
           steps: [
-            {uses: 'actions/checkout@v2'},
+            {uses: 'actions/checkout@v3'},
             {
               name: 'Setup node',
-              uses: 'actions/setup-node@v2',
+              uses: 'actions/setup-node@v3',
               with: {'node-version-file': '.nvmrc', cache: 'npm'}
             },
             {run: 'npm clean-install'},
