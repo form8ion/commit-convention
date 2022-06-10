@@ -7,7 +7,7 @@ import scaffoldCommitlint from './commitlint';
 
 export default async function ({projectRoot, projectType, configs, pathWithinParent}) {
   const detailsForProjectsPublishedToARegistry = [projectTypes.PACKAGE, projectTypes.CLI].includes(projectType)
-    ? scaffoldSemanticRelease()
+    ? await scaffoldSemanticRelease({projectRoot})
     : {};
 
   if (pathWithinParent) return detailsForProjectsPublishedToARegistry;

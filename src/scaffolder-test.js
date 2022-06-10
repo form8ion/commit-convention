@@ -33,7 +33,7 @@ suite('commit-convention scaffolder', () => {
     sandbox.stub(semanticReleaseScaffolder, 'default');
 
     commitizenScaffolder.default.withArgs({projectRoot}).resolves(commitizenResults);
-    semanticReleaseScaffolder.default.returns(semanticReleaseResults);
+    semanticReleaseScaffolder.default.withArgs({projectRoot}).resolves(semanticReleaseResults);
   });
 
   teardown(() => sandbox.restore());
@@ -45,6 +45,7 @@ suite('commit-convention scaffolder', () => {
   test('that only semantic-release is configured for a sub-package', async () => {
     assert.deepEqual(
       await scaffoldCommitConvention({
+        projectRoot,
         pathWithinParent: any.string(),
         projectType: publishedProjectType
       }),
