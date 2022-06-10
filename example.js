@@ -2,7 +2,7 @@
 // remark-usage-ignore-next
 import stubbedFs from 'mock-fs';
 import {packageManagers} from '@form8ion/javascript-core';
-import {scaffold, test, lift} from './lib/index.cjs';
+import {scaffold, test, lift} from './lib/index.js';
 
 // remark-usage-ignore-next
 stubbedFs({'package.json': JSON.stringify({version: '0.0.0-semantically-released'})});
