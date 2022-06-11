@@ -16,9 +16,7 @@ When('the project is scaffolded', async function () {
   // eslint-disable-next-line import/no-extraneous-dependencies,import/no-unresolved
   const {scaffold} = require('@form8ion/commit-convention');
 
-  stubbedFs({
-    node_modules: stubbedNodeModules
-  });
+  stubbedFs({node_modules: stubbedNodeModules});
 
   await scaffold({projectRoot, configs: {}});
 });
