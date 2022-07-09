@@ -1,5 +1,4 @@
-import {promises as fs} from 'fs';
-import {dump} from 'js-yaml';
+import {fileTypes, writeConfigFile} from '@form8ion/core';
 import {
   scaffoldCheckoutStep,
   scaffoldNodeSetupStep,
@@ -7,9 +6,11 @@ import {
 } from '@form8ion/github-workflows-core';
 
 export default async function ({projectRoot}) {
-  await fs.writeFile(
-    `${projectRoot}/.github/workflows/release.yml`,
-    dump({
+  await writeConfigFile({
+    format: fileTypes.YAML,
+    path: `${projectRoot}/.github/workflows`,
+    name: 'release',
+    config: {
       name: 'Release',
       on: {push: {branches: ['alpha']}, workflow_dispatch: {}},
       env: {FORCE_COLOR: 1, NPM_CONFIG_COLOR: 'always'},
@@ -31,6 +32,6 @@ export default async function ({projectRoot}) {
           ]
         }
       }
-    })
-  );
+    }
+  });
 }

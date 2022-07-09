@@ -1,18 +1,18 @@
 import {promises as fs} from 'fs';
-import {dump, load} from 'js-yaml';
-import {fileExists} from '@form8ion/core';
+import {load} from 'js-yaml';
+import {fileExists, fileTypes, writeConfigFile} from '@form8ion/core';
 
 import determineTriggerNeedsFrom from './release-trigger-needs';
 import scaffoldReleaseWorkflow from './scaffolder';
 
 export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: vcsOwner}}) {
-  const pathToVerificationWorkflow = `${projectRoot}/.github/workflows/node-ci.yml`;
+  const workflowsDirectory = `${projectRoot}/.github/workflows`;
 
-  if (!await fileExists(`${projectRoot}/.github/workflows/release.yml`)) {
+  if (!await fileExists(`${workflowsDirectory}/release.yml`)) {
     await scaffoldReleaseWorkflow({projectRoot});
   }
 
-  const parsedVerificationWorkflowDetails = load(await fs.readFile(pathToVerificationWorkflow, 'utf-8'));
+  const parsedVerificationWorkflowDetails = load(await fs.readFile(`${workflowsDirectory}/node-ci.yml`, 'utf-8'));
 
   parsedVerificationWorkflowDetails.on.push.branches = [
     ...parsedVerificationWorkflowDetails.on.push.branches.filter(branch => 'alpha' !== branch),
@@ -20,6 +20,7 @@ export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: 
   ];
 
   const {release, ...otherJobs} = parsedVerificationWorkflowDetails.jobs;
+
   parsedVerificationWorkflowDetails.jobs = {
     ...otherJobs,
     'trigger-release': {
@@ -42,5 +43,10 @@ export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: 
     }
   };
 
-  await fs.writeFile(pathToVerificationWorkflow, dump(parsedVerificationWorkflowDetails));
+  await writeConfigFile({
+    format: fileTypes.YAML,
+    name: 'node-ci',
+    path: workflowsDirectory,
+    config: parsedVerificationWorkflowDetails
+  });
 }
