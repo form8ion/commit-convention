@@ -7,6 +7,14 @@ Feature: Lift
     Then the release workflow is defined
     And the verification workflow triggers the release workflow
 
+  Scenario: cycjimmy action in a GitHub workflow
+    Given semantic-release is configured
+    And the cycjimmy action is configured in a GitHub workflow
+    When the project is lifted
+    Then the release workflow is defined
+    And the verification workflow triggers the release workflow
+    And the cycjimmy action was removed
+
   Scenario: modern semantic-release in GitHub workflows
     Given semantic-release is configured
     And modern releases are configured in a GitHub workflow

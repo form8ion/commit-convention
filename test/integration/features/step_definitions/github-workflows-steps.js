@@ -13,6 +13,12 @@ Given('legacy releases are configured in a GitHub workflow', async function () {
   this.betaBranchTrigger = true;
 });
 
+Given('the cycjimmy action is configured in a GitHub workflow', async function () {
+  this.githubWorkflows = true;
+  this.verificationWorkflow = true;
+  this.nodeCiWithCycjimmyAction = true;
+});
+
 Given('modern releases are configured in a GitHub workflow', async function () {
   this.githubWorkflows = true;
   this.verificationWorkflow = true;
@@ -91,4 +97,13 @@ Then('the release is not triggered until verification completes', async function
 
   assert.include(triggerReleaseJob.needs, 'verify');
   if (this.multipleNodeVersionsVerified) assert.include(triggerReleaseJob.needs, 'verify-matrix');
+});
+
+Then('the cycjimmy action was removed', async function () {
+  const ciWorkflow = await fs.readFile(
+    `${process.cwd()}/.github/workflows/node-ci.yml`,
+    'utf-8'
+  );
+
+  assert.notInclude(ciWorkflow, 'cycjimmy');
 });

@@ -45,10 +45,24 @@ When('the project is lifted', async function () {
                 }
               },
               jobs: {
-                verify: {},
-                ...this.multipleNodeVersionsVerified && {'verify-matrix': {}},
-                ...this.nodeCiWithReleaseJob && {release: {}},
-                ...this.nodeCiWithTriggerReleaseJob && {'trigger-release': {}}
+                verify: {steps: []},
+                ...this.multipleNodeVersionsVerified && {'verify-matrix': {steps: []}},
+                ...this.nodeCiWithReleaseJob && {release: {steps: []}},
+                ...this.nodeCiWithCycjimmyAction && {
+                  [any.word()]: {
+                    steps: [{
+                      name: 'semantic-release',
+                      uses: 'cycjimmy/semantic-release-action@v2',
+                      env: {
+                        // eslint-disable-next-line no-template-curly-in-string
+                        GITHUB_TOKEN: '${{ secrets.GH_TOKEN }}',
+                        // eslint-disable-next-line no-template-curly-in-string
+                        NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'
+                      }
+                    }]
+                  }
+                },
+                ...this.nodeCiWithTriggerReleaseJob && {'trigger-release': {steps: []}}
               }
             })
           },

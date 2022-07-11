@@ -5,6 +5,13 @@ import {fileExists, fileTypes, writeConfigFile} from '@form8ion/core';
 import determineTriggerNeedsFrom from './release-trigger-needs';
 import scaffoldReleaseWorkflow from './scaffolder';
 
+function removeCycjimmyActionFrom(otherJobs) {
+  return Object.fromEntries(Object.entries(otherJobs).map(([jobName, job]) => [
+    jobName,
+    {...job, steps: job.steps.filter(step => !step.uses?.includes('cycjimmy/semantic-release-action'))}
+  ]));
+}
+
 export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: vcsOwner}}) {
   const workflowsDirectory = `${projectRoot}/.github/workflows`;
 
@@ -22,7 +29,7 @@ export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: 
   const {release, ...otherJobs} = parsedVerificationWorkflowDetails.jobs;
 
   parsedVerificationWorkflowDetails.jobs = {
-    ...otherJobs,
+    ...removeCycjimmyActionFrom(otherJobs),
     'trigger-release': {
       'runs-on': 'ubuntu-latest',
       if: "github.event_name == 'push'",
