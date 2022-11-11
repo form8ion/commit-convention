@@ -27,37 +27,19 @@ suite('github release workflow scaffolder', () => {
     const projectRoot = any.string();
     const workflowsDirectory = `${projectRoot}/.github/workflows`;
     const dumpedWorkflowYaml = any.simpleObject();
-    const checkoutStep = any.simpleObject();
-    const setupNodeStep = any.simpleObject();
-    const installDependenciesStep = any.simpleObject();
     jsYaml.dump
       .withArgs({
         name: 'Release',
-        on: {push: {branches: ['alpha']}, workflow_dispatch: {}},
-        env: {FORCE_COLOR: 1, NPM_CONFIG_COLOR: 'always'},
+        on: {push: {branches: ['alpha']}},
         jobs: {
           release: {
-            'runs-on': 'ubuntu-latest',
-            steps: [
-              checkoutStep,
-              setupNodeStep,
-              installDependenciesStep,
-              {
-                name: 'semantic-release',
-                run: 'npx semantic-release',
-                env: {
-                  GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}',      // eslint-disable-line no-template-curly-in-string
-                  NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'     // eslint-disable-line no-template-curly-in-string
-                }
-              }
-            ]
+            uses: 'form8ion/.github/.github/workflows/release-package.yml@master',
+            // eslint-disable-next-line no-template-curly-in-string
+            secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}
           }
         }
       })
       .returns(dumpedWorkflowYaml);
-    githubWorkflowsCore.scaffoldCheckoutStep.returns(checkoutStep);
-    githubWorkflowsCore.scaffoldNodeSetupStep.withArgs({versionDeterminedBy: 'nvmrc'}).returns(setupNodeStep);
-    githubWorkflowsCore.scaffoldDependencyInstallationStep.returns(installDependenciesStep);
 
     await scaffoldReleaseWorkflow({projectRoot});
 

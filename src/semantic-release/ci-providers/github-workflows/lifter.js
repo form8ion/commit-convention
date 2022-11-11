@@ -1,23 +1,24 @@
 import {promises as fs} from 'fs';
 import {load} from 'js-yaml';
-import {fileExists, fileTypes, writeConfigFile} from '@form8ion/core';
+import {fileTypes, writeConfigFile} from '@form8ion/core';
 
 import determineTriggerNeedsFrom from './release-trigger-needs';
-import scaffoldReleaseWorkflow from './scaffolder';
+import {lift as liftReleaseWorkflow} from './release-workflow-for-alpha';
 
 function removeCycjimmyActionFrom(otherJobs) {
   return Object.fromEntries(Object.entries(otherJobs).map(([jobName, job]) => [
     jobName,
-    {...job, steps: job.steps.filter(step => !step.uses?.includes('cycjimmy/semantic-release-action'))}
+    {
+      ...job,
+      ...job.steps && {steps: job.steps.filter(step => !step.uses?.includes('cycjimmy/semantic-release-action'))}
+    }
   ]));
 }
 
-export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: vcsOwner}}) {
+export default async function ({projectRoot}) {
   const workflowsDirectory = `${projectRoot}/.github/workflows`;
 
-  if (!await fileExists(`${workflowsDirectory}/release.yml`)) {
-    await scaffoldReleaseWorkflow({projectRoot});
-  }
+  await liftReleaseWorkflow({projectRoot});
 
   const parsedVerificationWorkflowDetails = load(await fs.readFile(`${workflowsDirectory}/node-ci.yml`, 'utf-8'));
 
@@ -26,27 +27,15 @@ export default async function ({projectRoot, vcs: {name: vcsProjectName, owner: 
     ...!parsedVerificationWorkflowDetails.on.push.branches.includes('beta') ? ['beta'] : []
   ];
 
-  const {release, ...otherJobs} = parsedVerificationWorkflowDetails.jobs;
+  const {jobs} = parsedVerificationWorkflowDetails;
 
   parsedVerificationWorkflowDetails.jobs = {
-    ...removeCycjimmyActionFrom(otherJobs),
-    'trigger-release': {
-      'runs-on': 'ubuntu-latest',
-      if: "github.event_name == 'push'",
-      needs: determineTriggerNeedsFrom(parsedVerificationWorkflowDetails.jobs),
-      steps: [{
-        uses: 'octokit/request-action@v2.x',
-        with: {
-          route: 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
-          owner: vcsOwner,
-          repo: vcsProjectName,
-          ref: '${{ github.ref }}',                       // eslint-disable-line no-template-curly-in-string
-          workflow_id: 'release.yml'
-        },
-        env: {
-          GITHUB_TOKEN: '${{ secrets.GH_PAT }}'           // eslint-disable-line no-template-curly-in-string
-        }
-      }]
+    ...removeCycjimmyActionFrom(jobs),
+    release: {
+      needs: determineTriggerNeedsFrom(jobs),
+      uses: 'form8ion/.github/.github/workflows/release-package.yml@master',
+      // eslint-disable-next-line no-template-curly-in-string
+      secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}
     }
   };
 

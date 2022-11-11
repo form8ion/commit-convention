@@ -29,7 +29,7 @@
     "pregenerate:md": "run-s build",
     "lint:sensitive": "ban",
     "prepare": "husky install",
-    "pretest:integration": "run-s build",
+    "pretest:integration:base": "run-s build",
     "lint:gherkin": "gherkin-lint",
     "test:integration": "run-s 'test:integration:base -- --profile noWip'",
     "test:integration:base": "NODE_OPTIONS=--enable-source-maps DEBUG=any cucumber-js test/integration --profile base",

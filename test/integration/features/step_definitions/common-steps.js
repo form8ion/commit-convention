@@ -25,9 +25,6 @@ When('the project is lifted', async function () {
   // eslint-disable-next-line import/no-extraneous-dependencies,import/no-unresolved
   const {test, lift} = require('@form8ion/commit-convention');
 
-  this.projectName = any.word();
-  this.vcsOwner = any.word();
-
   stubbedFs({
     ...this.githubWorkflows && {
       '.github': {
@@ -62,12 +59,21 @@ When('the project is lifted', async function () {
                     }]
                   }
                 },
-                ...this.nodeCiWithTriggerReleaseJob && {'trigger-release': {steps: []}}
+                ...this.nodeCiWithTriggerReleaseJob && {'trigger-release': {steps: []}},
+                ...this.nodeCiWithCallReleaseJob && {
+                  release: {uses: 'form8ion/.github/.github/workflows/release-package.yml@master'}
+                }
               }
             })
           },
           ...this.releaseWorkflow && {
-            'release.yml': dump({})
+            'release.yml': dump({
+              ...this.localReleaseWorkflow && {on: {push: {branches: ['alpha']}, workflow_dispatch: {}}},
+              ...this.alphaReleaseWorkflow && {
+                on: {push: {branches: ['alpha']}},
+                jobs: {release: {uses: 'form8ion/.github/.github/workflows/release-package.yml@master'}}
+              }
+            })
           }
         }
       }
@@ -80,6 +86,6 @@ When('the project is lifted', async function () {
   });
 
   if (await test({projectRoot})) {
-    await lift({projectRoot, vcs: {owner: this.vcsOwner, name: this.projectName}});
+    await lift({projectRoot});
   }
 });
