@@ -27,12 +27,12 @@ export default async function ({projectRoot}) {
     ...!parsedVerificationWorkflowDetails.on.push.branches.includes('beta') ? ['beta'] : []
   ];
 
-  const {jobs} = parsedVerificationWorkflowDetails;
+  const {'trigger-release': triggerRelease, ...otherJobs} = parsedVerificationWorkflowDetails.jobs;
 
   parsedVerificationWorkflowDetails.jobs = {
-    ...removeCycjimmyActionFrom(jobs),
+    ...removeCycjimmyActionFrom(otherJobs),
     release: {
-      needs: determineTriggerNeedsFrom(jobs),
+      needs: determineTriggerNeedsFrom(otherJobs),
       uses: 'form8ion/.github/.github/workflows/release-package.yml@master',
       // eslint-disable-next-line no-template-curly-in-string
       secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}

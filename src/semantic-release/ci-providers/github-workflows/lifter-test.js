@@ -74,6 +74,36 @@ suite('github-workflows lifter for semantic-release', () => {
     );
   });
 
+  test('that the dispatched release job is replaced', async () => {
+    const existingJobs = {...jobs, 'trigger-release': legacyReleaseJob};
+    fs.readFile.withArgs(`${workflowsDirectory}/node-ci.yml`, 'utf-8').resolves(verificationWorkflowContents);
+    releaseTriggerNeeds.default.withArgs(jobs).returns(neededJobsToTriggerRelease);
+    jsYaml.load
+      .withArgs(verificationWorkflowContents)
+      .returns({
+        ...parsedVerificationWorkflowContents,
+        on: {push: {branches: [...branchTriggers, 'alpha', 'beta', ...moreBranchTriggers]}},
+        jobs: existingJobs
+      });
+
+    await lift({projectRoot});
+
+    assert.calledWith(releaseWorkflowLifter.default, {projectRoot});
+    assert.calledWith(
+      core.writeConfigFile,
+      {
+        format: core.fileTypes.YAML,
+        name: 'node-ci',
+        path: workflowsDirectory,
+        config: {
+          ...parsedVerificationWorkflowContents,
+          on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
+          jobs: {...jobs, release: modernReleaseJobDefinition}
+        }
+      }
+    );
+  });
+
   test('that a modern release job is left as-is', async () => {
     const existingJobs = {...jobs, release: modernReleaseJobDefinition};
     releaseTriggerNeeds.default.withArgs(existingJobs).returns(neededJobsToTriggerRelease);

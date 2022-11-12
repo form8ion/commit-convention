@@ -86,6 +86,9 @@ Then('the verification workflow calls the reusable release workflow', async func
   assert.include(branchTriggers, 'dependency-updater/**');
 
   const verificationWorkflowJobs = verificationWorkflowDefinition.jobs;
+
+  assert.notInclude(Object.keys(verificationWorkflowJobs), 'trigger-release');
+
   const releaseJob = verificationWorkflowJobs.release;
 
   assert.deepEqual(releaseJob.needs, ['verify']);
