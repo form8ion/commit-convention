@@ -79,6 +79,7 @@ When('the project is lifted', async function () {
       }
     },
     node_modules: stubbedNodeModules,
+    '.nvmrc': `${this.projectNodeVersion || 18}`,
     'package.json': JSON.stringify({
       ...any.simpleObject(),
       ...this.semanticReleaseConfigured && {version: '0.0.0-semantically-released'}
