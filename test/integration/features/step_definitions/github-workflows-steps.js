@@ -5,6 +5,14 @@ import {Given, Then} from '@cucumber/cucumber';
 import {assert} from 'chai';
 import {load} from 'js-yaml';
 
+async function loadReleaseWorkflowDefinition() {
+  assert.isTrue(await fileExists(`${process.cwd()}/.github/workflows/release.yml`), 'Release workflow is missing');
+
+  const {on: triggers, jobs} = load(await fs.readFile(`${process.cwd()}/.github/workflows/release.yml`, 'utf-8'));
+
+  return {triggers, jobs};
+}
+
 Given('legacy releases are configured in a GitHub workflow', async function () {
   this.githubWorkflows = true;
   this.verificationWorkflow = true;
@@ -61,13 +69,19 @@ Given('no GitHub workflows exist', async function () {
 });
 
 Then('the release workflow calls the reusable workflow for alpha branches', async function () {
-  assert.isTrue(await fileExists(`${process.cwd()}/.github/workflows/release.yml`));
-
-  const {on: triggers, jobs} = load(await fs.readFile(`${process.cwd()}/.github/workflows/release.yml`, 'utf-8'));
+  const {triggers, jobs} = await loadReleaseWorkflowDefinition();
 
   assert.isUndefined(triggers.workflow_dispatch);
   assert.deepEqual(triggers.push.branches, ['alpha']);
   assert.equal(jobs.release.uses, 'form8ion/.github/.github/workflows/release-package.yml@master');
+});
+
+Then('the release workflow calls the reusable workflow for semantic-release v19 for alpha branches', async function () {
+  const {triggers, jobs} = await loadReleaseWorkflowDefinition();
+
+  assert.isUndefined(triggers.workflow_dispatch);
+  assert.deepEqual(triggers.push.branches, ['alpha']);
+  assert.equal(jobs.release.uses, 'form8ion/.github/.github/workflows/release-package-semantic-release-19.yml@master');
 });
 
 Then('the release workflow is not defined', async function () {
@@ -94,6 +108,30 @@ Then('the verification workflow calls the reusable release workflow', async func
   assert.deepEqual(releaseJob.needs, ['verify']);
 
   assert.equal(releaseJob.uses, 'form8ion/.github/.github/workflows/release-package.yml@master');
+  // eslint-disable-next-line no-template-curly-in-string
+  assert.equal(releaseJob.secrets.NPM_TOKEN, '${{ secrets.NPM_PUBLISH_TOKEN }}');
+});
+
+Then('the verification workflow calls the reusable release workflow for semantic-release v19', async function () {
+  const verificationWorkflowDefinition = load(await fs.readFile(
+    `${process.cwd()}/.github/workflows/node-ci.yml`,
+    'utf-8'
+  ));
+  const branchTriggers = verificationWorkflowDefinition.on.push.branches;
+
+  assert.include(branchTriggers, 'master');
+  assert.include(branchTriggers, 'beta');
+  assert.include(branchTriggers, 'dependency-updater/**');
+
+  const verificationWorkflowJobs = verificationWorkflowDefinition.jobs;
+
+  assert.notInclude(Object.keys(verificationWorkflowJobs), 'trigger-release');
+
+  const releaseJob = verificationWorkflowJobs.release;
+
+  assert.deepEqual(releaseJob.needs, ['verify']);
+
+  assert.equal(releaseJob.uses, 'form8ion/.github/.github/workflows/release-package-semantic-release-19.yml@master');
   // eslint-disable-next-line no-template-curly-in-string
   assert.equal(releaseJob.secrets.NPM_TOKEN, '${{ secrets.NPM_PUBLISH_TOKEN }}');
 });
