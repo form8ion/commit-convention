@@ -13,6 +13,7 @@ import lift from './lifter';
 suite('github-workflows lifter for semantic-release', () => {
   let sandbox;
   const projectRoot = any.string();
+  const nodeVersion = any.string();
   const workflowsDirectory = `${projectRoot}/.github/workflows`;
   const verificationWorkflowContents = any.string();
   const parsedVerificationWorkflowContents = any.simpleObject();
@@ -56,9 +57,9 @@ suite('github-workflows lifter for semantic-release', () => {
         jobs: existingJobs
       });
 
-    await lift({projectRoot});
+    await lift({projectRoot, nodeVersion});
 
-    assert.calledWith(releaseWorkflowLifter.default, {projectRoot});
+    assert.calledWith(releaseWorkflowLifter.default, {projectRoot, nodeVersion});
     assert.calledWith(
       core.writeConfigFile,
       {
@@ -86,9 +87,9 @@ suite('github-workflows lifter for semantic-release', () => {
         jobs: existingJobs
       });
 
-    await lift({projectRoot});
+    await lift({projectRoot, nodeVersion});
 
-    assert.calledWith(releaseWorkflowLifter.default, {projectRoot});
+    assert.calledWith(releaseWorkflowLifter.default, {projectRoot, nodeVersion});
     assert.calledWith(
       core.writeConfigFile,
       {

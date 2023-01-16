@@ -15,10 +15,10 @@ function removeCycjimmyActionFrom(otherJobs) {
   ]));
 }
 
-export default async function ({projectRoot}) {
+export default async function ({projectRoot, nodeVersion}) {
   const workflowsDirectory = `${projectRoot}/.github/workflows`;
 
-  await liftReleaseWorkflow({projectRoot});
+  await liftReleaseWorkflow({projectRoot, nodeVersion});
 
   const parsedVerificationWorkflowDetails = load(await fs.readFile(`${workflowsDirectory}/node-ci.yml`, 'utf-8'));
 
