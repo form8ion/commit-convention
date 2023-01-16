@@ -4,6 +4,7 @@ import {fileTypes, writeConfigFile} from '@form8ion/core';
 
 import determineTriggerNeedsFrom from './release-trigger-needs';
 import {lift as liftReleaseWorkflow} from './release-workflow-for-alpha';
+import {determineAppropriateWorkflow} from './reusable-release-workflow';
 
 function removeCycjimmyActionFrom(otherJobs) {
   return Object.fromEntries(Object.entries(otherJobs).map(([jobName, job]) => [
@@ -33,7 +34,7 @@ export default async function ({projectRoot, nodeVersion}) {
     ...removeCycjimmyActionFrom(otherJobs),
     release: {
       needs: determineTriggerNeedsFrom(otherJobs),
-      uses: 'form8ion/.github/.github/workflows/release-package.yml@master',
+      uses: determineAppropriateWorkflow(nodeVersion),
       // eslint-disable-next-line no-template-curly-in-string
       secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}
     }

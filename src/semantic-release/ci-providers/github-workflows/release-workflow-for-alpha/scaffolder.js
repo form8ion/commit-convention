@@ -1,6 +1,8 @@
 import {fileTypes, writeConfigFile} from '@form8ion/core';
 
-export default async function ({projectRoot}) {
+import {determineAppropriateWorkflow} from '../reusable-release-workflow';
+
+export default async function ({projectRoot, nodeVersion}) {
   await writeConfigFile({
     format: fileTypes.YAML,
     path: `${projectRoot}/.github/workflows`,
@@ -10,7 +12,7 @@ export default async function ({projectRoot}) {
       on: {push: {branches: ['alpha']}},
       jobs: {
         release: {
-          uses: 'form8ion/.github/.github/workflows/release-package.yml@master',
+          uses: determineAppropriateWorkflow(nodeVersion),
           // eslint-disable-next-line no-template-curly-in-string
           secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}
         }

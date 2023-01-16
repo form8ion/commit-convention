@@ -7,6 +7,7 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 
 import * as releaseTriggerNeeds from './release-trigger-needs';
+import * as reusableReleaseWorkflow from './reusable-release-workflow';
 import * as releaseWorkflowLifter from './release-workflow-for-alpha/lifter';
 import lift from './lifter';
 
@@ -22,9 +23,10 @@ suite('github-workflows lifter for semantic-release', () => {
   const branchTriggers = any.listOf(any.word);
   const moreBranchTriggers = any.listOf(any.word);
   const neededJobsToTriggerRelease = any.listOf(any.word);
+  const reusableReleaseWorkflowReference = any.string();
   const modernReleaseJobDefinition = {
     needs: neededJobsToTriggerRelease,
-    uses: 'form8ion/.github/.github/workflows/release-package.yml@master',
+    uses: reusableReleaseWorkflowReference,
     // eslint-disable-next-line no-template-curly-in-string
     secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}
   };
@@ -37,10 +39,14 @@ suite('github-workflows lifter for semantic-release', () => {
     sandbox.stub(core, 'writeConfigFile');
     sandbox.stub(releaseWorkflowLifter, 'default');
     sandbox.stub(releaseTriggerNeeds, 'default');
+    sandbox.stub(reusableReleaseWorkflow, 'determineAppropriateWorkflow');
 
     const commonVerificationWorkflowContents = any.string();
     fs.readFile.withArgs(`${workflowsDirectory}/node-ci.yml`, 'utf-8').resolves(commonVerificationWorkflowContents);
     jsYaml.load.withArgs(commonVerificationWorkflowContents).returns({on: {push: {branches: []}}, jobs: {}});
+    reusableReleaseWorkflow.determineAppropriateWorkflow
+      .withArgs(nodeVersion)
+      .returns(reusableReleaseWorkflowReference);
   });
 
   teardown(() => sandbox.restore());
@@ -117,7 +123,7 @@ suite('github-workflows lifter for semantic-release', () => {
         jobs: existingJobs
       });
 
-    await lift({projectRoot});
+    await lift({projectRoot, nodeVersion});
 
     assert.calledWith(
       core.writeConfigFile,
@@ -156,7 +162,7 @@ suite('github-workflows lifter for semantic-release', () => {
         jobs: existingJobs
       });
 
-    await lift({projectRoot});
+    await lift({projectRoot, nodeVersion});
 
     assert.calledWith(
       core.writeConfigFile,
@@ -170,12 +176,7 @@ suite('github-workflows lifter for semantic-release', () => {
           jobs: {
             ...jobs,
             [jobNameContainingCycjimmyAction]: {steps: otherStepsInJobContainingCycJimmyAction},
-            release: {
-              needs: neededJobsToTriggerRelease,
-              uses: 'form8ion/.github/.github/workflows/release-package.yml@master',
-              // eslint-disable-next-line no-template-curly-in-string
-              secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}
-            }
+            release: modernReleaseJobDefinition
           }
         }
       }
@@ -193,7 +194,7 @@ suite('github-workflows lifter for semantic-release', () => {
         jobs
       });
 
-    await lift({projectRoot});
+    await lift({projectRoot, nodeVersion});
 
     assert.calledWith(
       core.writeConfigFile,
@@ -204,15 +205,7 @@ suite('github-workflows lifter for semantic-release', () => {
         config: {
           ...parsedVerificationWorkflowContents,
           on: {push: {branches: [...branchTriggers, ...moreBranchTriggers, 'beta']}},
-          jobs: {
-            ...jobs,
-            release: {
-              needs: neededJobsToTriggerRelease,
-              uses: 'form8ion/.github/.github/workflows/release-package.yml@master',
-              // eslint-disable-next-line no-template-curly-in-string
-              secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}
-            }
-          }
+          jobs: {...jobs, release: modernReleaseJobDefinition}
         }
       }
     );

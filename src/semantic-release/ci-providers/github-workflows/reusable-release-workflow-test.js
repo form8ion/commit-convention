@@ -15,7 +15,7 @@ suite('reusable release workflow', () => {
   test('that the reusable workflow for semantic-release v19 is defined for a lower node version', async () => {
     assert.equal(
       determineAppropriateWorkflow(any.fromList(['14', '16', '17'])),
-      'form8ion/.github/.github/workflows/release-package-sematnic-release-19.yml@master'
+      'form8ion/.github/.github/workflows/release-package-semantic-release-19.yml@master'
     );
   });
 });

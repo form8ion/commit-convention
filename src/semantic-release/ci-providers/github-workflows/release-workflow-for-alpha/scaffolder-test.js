@@ -6,10 +6,12 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 import any from '@travi/any';
 
+import * as reusableWorkflow from '../reusable-release-workflow';
 import scaffoldReleaseWorkflow from './scaffolder';
 
 suite('github release workflow scaffolder', () => {
   let sandbox;
+  const nodeVersion = any.string();
 
   setup(() => {
     sandbox = sinon.createSandbox();
@@ -19,6 +21,7 @@ suite('github release workflow scaffolder', () => {
     sandbox.stub(githubWorkflowsCore, 'scaffoldCheckoutStep');
     sandbox.stub(githubWorkflowsCore, 'scaffoldNodeSetupStep');
     sandbox.stub(githubWorkflowsCore, 'scaffoldDependencyInstallationStep');
+    sandbox.stub(reusableWorkflow, 'determineAppropriateWorkflow');
   });
 
   teardown(() => sandbox.restore());
@@ -27,13 +30,15 @@ suite('github release workflow scaffolder', () => {
     const projectRoot = any.string();
     const workflowsDirectory = `${projectRoot}/.github/workflows`;
     const dumpedWorkflowYaml = any.simpleObject();
+    const reusableReleaseWorkflowReference = any.string();
+    reusableWorkflow.determineAppropriateWorkflow.withArgs(nodeVersion).returns(reusableReleaseWorkflowReference);
     jsYaml.dump
       .withArgs({
         name: 'Release',
         on: {push: {branches: ['alpha']}},
         jobs: {
           release: {
-            uses: 'form8ion/.github/.github/workflows/release-package.yml@master',
+            uses: reusableReleaseWorkflowReference,
             // eslint-disable-next-line no-template-curly-in-string
             secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}
           }
@@ -41,7 +46,7 @@ suite('github release workflow scaffolder', () => {
       })
       .returns(dumpedWorkflowYaml);
 
-    await scaffoldReleaseWorkflow({projectRoot});
+    await scaffoldReleaseWorkflow({projectRoot, nodeVersion});
 
     assert.calledWith(fs.writeFile, `${workflowsDirectory}/release.yml`, dumpedWorkflowYaml);
   });
