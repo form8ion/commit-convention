@@ -12,6 +12,7 @@ import lift from './lifter';
 suite('release workflow lifter', () => {
   let sandbox;
   const projectRoot = any.string();
+  const nodeVersion = any.string();
   const workflowsDirectory = `${projectRoot}/.github/workflows`;
   const pathToReleaseWorkflowFile = `${workflowsDirectory}/release.yml`;
   const existingWorkflowContents = any.string();
@@ -30,9 +31,9 @@ suite('release workflow lifter', () => {
   test('that the scaffolder is called when a release workflow does not exist', async () => {
     core.fileExists.resolves(false);
 
-    await lift({projectRoot});
+    await lift({projectRoot, nodeVersion});
 
-    assert.calledWith(scaffolder.default, {projectRoot});
+    assert.calledWith(scaffolder.default, {projectRoot, nodeVersion});
   });
 
   test('that the scaffolder is re-run when the release workflow is dispatchable', async () => {
@@ -40,9 +41,9 @@ suite('release workflow lifter', () => {
     fs.readFile.withArgs(pathToReleaseWorkflowFile, 'utf-8').resolves(existingWorkflowContents);
     jsYaml.load.withArgs(existingWorkflowContents).returns({on: {workflow_dispatch: {}}});
 
-    await lift({projectRoot});
+    await lift({projectRoot, nodeVersion});
 
-    assert.calledWith(scaffolder.default, {projectRoot});
+    assert.calledWith(scaffolder.default, {projectRoot, nodeVersion});
   });
 
   test('that the scaffolder is not called when a modern release workflow already exists', async () => {

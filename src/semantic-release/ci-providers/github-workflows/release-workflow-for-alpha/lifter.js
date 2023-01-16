@@ -9,12 +9,12 @@ async function releaseWorkflowShouldBeScaffolded(pathToReleaseWorkflowFile) {
     || load(await fs.readFile(pathToReleaseWorkflowFile, 'utf-8')).on.workflow_dispatch;
 }
 
-export default async function ({projectRoot}) {
+export default async function ({projectRoot, nodeVersion}) {
   const workflowsDirectory = `${projectRoot}/.github/workflows`;
   const pathToReleaseWorkflowFile = `${workflowsDirectory}/release.yml`;
 
   if (await releaseWorkflowShouldBeScaffolded(pathToReleaseWorkflowFile)) {
-    return scaffolder({projectRoot});
+    return scaffolder({projectRoot, nodeVersion});
   }
 
   return undefined;
