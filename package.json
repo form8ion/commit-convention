@@ -58,7 +58,6 @@
   },
   "dependencies": {
     "@form8ion/core": "^2.0.0",
-    "@form8ion/github-workflows-core": "3.0.0",
     "@form8ion/javascript-core": "^9.0.0",
     "deepmerge": "^4.2.2",
     "js-yaml": "^4.1.0"
