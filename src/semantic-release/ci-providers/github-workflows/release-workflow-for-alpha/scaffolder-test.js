@@ -1,6 +1,5 @@
 import {promises as fs} from 'fs';
 import jsYaml from 'js-yaml';
-import * as githubWorkflowsCore from '@form8ion/github-workflows-core';
 
 import {assert} from 'chai';
 import sinon from 'sinon';
@@ -18,9 +17,6 @@ suite('github release workflow scaffolder', () => {
 
     sandbox.stub(fs, 'writeFile');
     sandbox.stub(jsYaml, 'dump');
-    sandbox.stub(githubWorkflowsCore, 'scaffoldCheckoutStep');
-    sandbox.stub(githubWorkflowsCore, 'scaffoldNodeSetupStep');
-    sandbox.stub(githubWorkflowsCore, 'scaffoldDependencyInstallationStep');
     sandbox.stub(reusableWorkflow, 'determineAppropriateWorkflow');
   });
 
