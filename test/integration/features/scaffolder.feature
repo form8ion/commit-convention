@@ -1,5 +1,9 @@
 Feature: Scaffolder
 
+  Scenario: configure the convention
+    When the project is scaffolded
+    Then commitlint will be configured
+
   Scenario: project not on github actions
     When the project is scaffolded
 

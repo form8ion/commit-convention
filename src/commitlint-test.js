@@ -1,7 +1,10 @@
-import {promises as fsPromises} from 'fs';
+import {fileTypes} from '@form8ion/core';
+import * as configFile from '@form8ion/config-file';
+
 import any from '@travi/any';
 import {assert} from 'chai';
 import sinon from 'sinon';
+
 import scaffoldCommitlint from './commitlint';
 
 suite('commitlint scaffolder', () => {
@@ -10,7 +13,7 @@ suite('commitlint scaffolder', () => {
   setup(() => {
     sandbox = sinon.createSandbox();
 
-    sandbox.stub(fsPromises, 'writeFile');
+    sandbox.stub(configFile, 'write');
   });
 
   teardown(() => sandbox.restore());
@@ -25,9 +28,13 @@ suite('commitlint scaffolder', () => {
       {devDependencies: [configPackageName]}
     );
     assert.calledWith(
-      fsPromises.writeFile,
-      `${projectRoot}/.commitlintrc.js`,
-      `module.exports = {extends: ['${configName}']};`
+      configFile.write,
+      {
+        format: fileTypes.JSON,
+        name: 'commitlint',
+        config: {extends: [configName]},
+        path: projectRoot
+      }
     );
   });
 });

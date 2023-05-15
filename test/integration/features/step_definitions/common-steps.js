@@ -1,12 +1,16 @@
 import {resolve} from 'path';
 import {dump} from 'js-yaml';
 
-import {After, When} from '@cucumber/cucumber';
+import {After, Before, When} from '@cucumber/cucumber';
 import stubbedFs from 'mock-fs';
 import any from '@travi/any';
 
 const stubbedNodeModules = stubbedFs.load(resolve(__dirname, '..', '..', '..', '..', 'node_modules'));
-const projectRoot = process.cwd();
+
+Before(function () {
+  this.projectRoot = process.cwd();
+  this.commilintConfigName = `@${any.word()}`;
+});
 
 After(function () {
   stubbedFs.restore();
@@ -18,7 +22,7 @@ When('the project is scaffolded', async function () {
 
   stubbedFs({node_modules: stubbedNodeModules});
 
-  await scaffold({projectRoot, configs: {}});
+  await scaffold({projectRoot: this.projectRoot, configs: {commitlint: {name: this.commilintConfigName}}});
 });
 
 When('the project is lifted', async function () {
@@ -86,7 +90,7 @@ When('the project is lifted', async function () {
     })
   });
 
-  if (await test({projectRoot})) {
-    await lift({projectRoot});
+  if (await test({projectRoot: this.projectRoot})) {
+    await lift({projectRoot: this.projectRoot});
   }
 });
