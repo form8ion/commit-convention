@@ -34,6 +34,12 @@ export default async function ({projectRoot, nodeVersion}) {
     ...removeCycjimmyActionFrom(otherJobs),
     release: {
       needs: determineTriggerNeedsFrom(otherJobs),
+      permissions: {
+        contents: 'write',
+        'id-token': 'write',
+        issues: 'write',
+        'pull-requests': 'write'
+      },
       uses: determineAppropriateWorkflow(nodeVersion),
       // eslint-disable-next-line no-template-curly-in-string
       secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}

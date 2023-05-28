@@ -26,6 +26,12 @@ suite('github-workflows lifter for semantic-release', () => {
   const reusableReleaseWorkflowReference = any.string();
   const modernReleaseJobDefinition = {
     needs: neededJobsToTriggerRelease,
+    permissions: {
+      contents: 'write',
+      'id-token': 'write',
+      issues: 'write',
+      'pull-requests': 'write'
+    },
     uses: reusableReleaseWorkflowReference,
     // eslint-disable-next-line no-template-curly-in-string
     secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}

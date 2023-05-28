@@ -106,6 +106,15 @@ Then('the verification workflow calls the reusable release workflow', async func
   const releaseJob = verificationWorkflowJobs.release;
 
   assert.deepEqual(releaseJob.needs, ['verify']);
+  assert.deepEqual(
+    releaseJob.permissions,
+    {
+      contents: 'write',
+      'id-token': 'write',
+      issues: 'write',
+      'pull-requests': 'write'
+    }
+  );
 
   assert.equal(releaseJob.uses, 'form8ion/.github/.github/workflows/release-package.yml@master');
   // eslint-disable-next-line no-template-curly-in-string
