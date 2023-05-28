@@ -32,8 +32,15 @@ suite('github release workflow scaffolder', () => {
       .withArgs({
         name: 'Release',
         on: {push: {branches: ['alpha']}},
+        permissions: {contents: 'read'},
         jobs: {
           release: {
+            permissions: {
+              contents: 'write',
+              'id-token': 'write',
+              issues: 'write',
+              'pull-requests': 'write'
+            },
             uses: reusableReleaseWorkflowReference,
             // eslint-disable-next-line no-template-curly-in-string
             secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}
