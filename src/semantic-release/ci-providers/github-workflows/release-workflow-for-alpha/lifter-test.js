@@ -46,10 +46,40 @@ suite('release workflow lifter', () => {
     assert.calledWith(scaffolder.default, {projectRoot, nodeVersion});
   });
 
-  test('that the scaffolder is not called when a modern release workflow already exists', async () => {
+  test('that the scaffolder is re-run when the release workflow does not restrict permissions', async () => {
     core.fileExists.withArgs(pathToReleaseWorkflowFile).resolves(true);
     fs.readFile.withArgs(pathToReleaseWorkflowFile, 'utf-8').resolves(existingWorkflowContents);
     jsYaml.load.withArgs(existingWorkflowContents).returns({on: {}});
+
+    await lift({projectRoot, nodeVersion});
+
+    assert.calledWith(scaffolder.default, {projectRoot, nodeVersion});
+  });
+
+  test('that the scaffolder is re-run when the release workflow does not restrict permissions enough', async () => {
+    core.fileExists.withArgs(pathToReleaseWorkflowFile).resolves(true);
+    fs.readFile.withArgs(pathToReleaseWorkflowFile, 'utf-8').resolves(existingWorkflowContents);
+    jsYaml.load.withArgs(existingWorkflowContents).returns({on: {}, permissions: any.simpleObject()});
+
+    await lift({projectRoot, nodeVersion});
+
+    assert.calledWith(scaffolder.default, {projectRoot, nodeVersion});
+  });
+
+  test('that the scaffolder is re-run when the workflow does not properly restrict contents permission', async () => {
+    core.fileExists.withArgs(pathToReleaseWorkflowFile).resolves(true);
+    fs.readFile.withArgs(pathToReleaseWorkflowFile, 'utf-8').resolves(existingWorkflowContents);
+    jsYaml.load.withArgs(existingWorkflowContents).returns({on: {}, permissions: {contents: 'write'}});
+
+    await lift({projectRoot, nodeVersion});
+
+    assert.calledWith(scaffolder.default, {projectRoot, nodeVersion});
+  });
+
+  test('that the scaffolder is not called when a modern release workflow already exists', async () => {
+    core.fileExists.withArgs(pathToReleaseWorkflowFile).resolves(true);
+    fs.readFile.withArgs(pathToReleaseWorkflowFile, 'utf-8').resolves(existingWorkflowContents);
+    jsYaml.load.withArgs(existingWorkflowContents).returns({on: {}, permissions: {contents: 'read'}});
 
     await lift({projectRoot});
 

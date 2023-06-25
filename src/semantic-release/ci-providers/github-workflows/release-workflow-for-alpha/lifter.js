@@ -4,9 +4,20 @@ import {fileExists} from '@form8ion/core';
 
 import scaffolder from './scaffolder';
 
+function workflowPermissionsAreMinimal(existingContents) {
+  return existingContents.permissions
+    && existingContents.permissions.contents
+    && 'read' === existingContents.permissions.contents;
+}
+
+async function contentsNeedToBeUpdated(pathToReleaseWorkflowFile) {
+  const existingContents = load(await fs.readFile(pathToReleaseWorkflowFile, 'utf-8'));
+
+  return existingContents.on.workflow_dispatch || !workflowPermissionsAreMinimal(existingContents);
+}
+
 async function releaseWorkflowShouldBeScaffolded(pathToReleaseWorkflowFile) {
-  return !await fileExists(pathToReleaseWorkflowFile)
-    || load(await fs.readFile(pathToReleaseWorkflowFile, 'utf-8')).on.workflow_dispatch;
+  return !await fileExists(pathToReleaseWorkflowFile) || contentsNeedToBeUpdated(pathToReleaseWorkflowFile);
 }
 
 export default async function ({projectRoot, nodeVersion}) {
