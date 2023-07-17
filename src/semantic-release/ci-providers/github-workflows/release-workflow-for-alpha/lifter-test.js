@@ -1,6 +1,6 @@
 import {promises as fs} from 'fs';
 import jsYaml from 'js-yaml';
-import * as core from '@form8ion/core';
+import core from '@form8ion/core';
 
 import any from '@travi/any';
 import sinon from 'sinon';
