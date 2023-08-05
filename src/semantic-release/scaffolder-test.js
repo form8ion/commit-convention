@@ -19,20 +19,7 @@ suite('semantic-release scaffolder', () => {
   teardown(() => sandbox.restore());
 
   test('that that the badge and version string are generated', async () => {
-    assert.deepEqual(
-      await scaffoldSemanticRelease({projectRoot}),
-      {
-        badges: {
-          contribution: {
-            'semantic-release': {
-              img: 'https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release',
-              text: 'semantic-release: angular',
-              link: 'https://github.com/semantic-release/semantic-release'
-            }
-          }
-        }
-      }
-    );
+    assert.deepEqual(await scaffoldSemanticRelease({projectRoot}), {});
 
     assert.calledWith(
       jsCore.mergeIntoExistingPackageJson,

@@ -9,5 +9,15 @@ export default async function ({projectRoot}) {
     await liftCiProvider({projectRoot, nodeVersion});
   }
 
-  return {};
+  return {
+    badges: {
+      contribution: {
+        'semantic-release': {
+          img: 'https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release',
+          text: 'semantic-release: angular',
+          link: 'https://github.com/semantic-release/semantic-release'
+        }
+      }
+    }
+  };
 }

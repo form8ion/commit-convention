@@ -25,7 +25,20 @@ suite('semantic-release lifter', () => {
   test('that results are returned', async () => {
     githubWorkflowsTester.default.resolves(false);
 
-    assert.deepEqual(await lift({projectRoot}), {});
+    assert.deepEqual(
+      await lift({projectRoot}),
+      {
+        badges: {
+          contribution: {
+            'semantic-release': {
+              img: 'https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release',
+              text: 'semantic-release: angular',
+              link: 'https://github.com/semantic-release/semantic-release'
+            }
+          }
+        }
+      }
+    );
     assert.notCalled(githubWorkflowsLifter.default);
   });
 
@@ -34,7 +47,20 @@ suite('semantic-release lifter', () => {
     fs.readFile.withArgs(`${projectRoot}/.nvmrc`, 'utf-8').resolves(nodeVersion);
     githubWorkflowsTester.default.withArgs({projectRoot}).resolves(true);
 
-    assert.deepEqual(await lift({projectRoot}), {});
+    assert.deepEqual(
+      await lift({projectRoot}),
+      {
+        badges: {
+          contribution: {
+            'semantic-release': {
+              img: 'https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release',
+              text: 'semantic-release: angular',
+              link: 'https://github.com/semantic-release/semantic-release'
+            }
+          }
+        }
+      }
+    );
     assert.calledWith(githubWorkflowsLifter.default, {projectRoot, nodeVersion});
   });
 });
