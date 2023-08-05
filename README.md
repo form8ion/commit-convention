@@ -6,6 +6,7 @@ form8ion plugin for managing tools related to commit conventions
 
 [![Node CI Workflow Status][github-actions-ci-badge]][github-actions-ci-link]
 [![Codecov][coverage-badge]][coverage-link]
+![SLSA Level 2][slsa-badge]
 
 <!--status-badges end -->
 
@@ -126,3 +127,5 @@ $ npm test
 [coverage-badge]: https://img.shields.io/codecov/c/github/form8ion/commit-convention.svg
 
 [node-badge]: https://img.shields.io/node/v/@form8ion/commit-convention?logo=node.js
+
+[slsa-badge]: https://slsa.dev/images/gh-badge-level2.svg
