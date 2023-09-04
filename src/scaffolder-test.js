@@ -7,7 +7,7 @@ import {assert} from 'chai';
 
 import * as semanticReleaseScaffolder from './semantic-release/scaffolder';
 import * as commitizenScaffolder from './commitizen';
-import * as commitlintScaffolder from './commitlint';
+import * as commitlintScaffolder from './commitlint/scaffolder';
 import scaffoldCommitConvention from './scaffolder';
 
 suite('commit-convention scaffolder', () => {

@@ -3,7 +3,7 @@ import {projectTypes} from '@form8ion/javascript-core';
 
 import {scaffold as scaffoldSemanticRelease} from './semantic-release';
 import scaffoldCommitizen from './commitizen';
-import scaffoldCommitlint from './commitlint';
+import {scaffold as scaffoldCommitlint} from './commitlint';
 
 export default async function ({projectRoot, projectType, configs, pathWithinParent}) {
   const detailsForProjectsPublishedToARegistry = [projectTypes.PACKAGE, projectTypes.CLI].includes(projectType)
