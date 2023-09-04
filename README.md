@@ -116,7 +116,7 @@ $ npm test
 
 [npm-link]: https://www.npmjs.com/package/@form8ion/commit-convention
 
-[npm-badge]: https://img.shields.io/npm/v/@form8ion/commit-convention.svg
+[npm-badge]: https://img.shields.io/npm/v/@form8ion/commit-convention?logo=npm
 
 [runkit-link]: https://npm.runkit.com/@form8ion/commit-convention
 
@@ -124,7 +124,7 @@ $ npm test
 
 [coverage-link]: https://codecov.io/github/form8ion/commit-convention
 
-[coverage-badge]: https://img.shields.io/codecov/c/github/form8ion/commit-convention.svg
+[coverage-badge]: https://img.shields.io/codecov/c/github/form8ion/commit-convention?logo=codecov
 
 [node-badge]: https://img.shields.io/node/v/@form8ion/commit-convention?logo=node.js
 
