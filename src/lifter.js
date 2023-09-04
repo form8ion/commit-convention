@@ -1,5 +1,9 @@
-import {lift as liftSemanticRelease} from './semantic-release';
+import {test as semanticReleaseIsInUse, lift as liftSemanticRelease} from './semantic-release';
 
-export default function ({projectRoot}) {
-  return liftSemanticRelease({projectRoot});
+export default async function ({projectRoot}) {
+  if (await semanticReleaseIsInUse({projectRoot})) {
+    return liftSemanticRelease({projectRoot});
+  }
+
+  return {};
 }
