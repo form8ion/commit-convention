@@ -1,2 +1,3 @@
 export {default as scaffold} from './scaffolder';
-export {test, lift} from './semantic-release';
+export {default as lift} from './lifter';
+export {test} from './semantic-release';
