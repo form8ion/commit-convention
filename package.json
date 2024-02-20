@@ -77,7 +77,7 @@
     "@form8ion/remark-lint-preset": "6.0.2",
     "@rollup/plugin-babel": "6.0.4",
     "@rollup/plugin-node-resolve": "15.2.3",
-    "@travi/any": "3.0.2",
+    "@travi/any": "3.1.0",
     "babel-plugin-istanbul": "6.1.1",
     "ban-sensitive-files": "1.10.1",
     "c8": "9.1.0",
