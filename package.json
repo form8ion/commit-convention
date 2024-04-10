@@ -74,7 +74,7 @@
     "@form8ion/eslint-config": "6.0.5",
     "@form8ion/eslint-config-cucumber": "1.4.1",
     "@form8ion/eslint-config-mocha": "3.0.3",
-    "@form8ion/remark-lint-preset": "6.0.2",
+    "@form8ion/remark-lint-preset": "6.0.3",
     "@rollup/plugin-babel": "6.0.4",
     "@rollup/plugin-node-resolve": "15.2.3",
     "@travi/any": "3.1.0",
