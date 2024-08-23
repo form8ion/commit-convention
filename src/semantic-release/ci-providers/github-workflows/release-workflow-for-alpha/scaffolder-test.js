@@ -51,6 +51,6 @@ suite('github release workflow scaffolder', () => {
 
     await scaffoldReleaseWorkflow({projectRoot, nodeVersion});
 
-    assert.calledWith(fs.writeFile, `${workflowsDirectory}/release.yml`, dumpedWorkflowYaml);
+    assert.calledWith(fs.writeFile, `${workflowsDirectory}/experimental-release.yml`, dumpedWorkflowYaml);
   });
 });

@@ -6,7 +6,7 @@ export default async function ({projectRoot, nodeVersion}) {
   await writeConfigFile({
     format: fileTypes.YAML,
     path: `${projectRoot}/.github/workflows`,
-    name: 'release',
+    name: 'experimental-release',
     config: {
       name: 'Release',
       on: {push: {branches: ['alpha']}},

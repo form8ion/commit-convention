@@ -6,9 +6,14 @@ import {assert} from 'chai';
 import {load} from 'js-yaml';
 
 async function loadReleaseWorkflowDefinition() {
-  assert.isTrue(await fileExists(`${process.cwd()}/.github/workflows/release.yml`), 'Release workflow is missing');
+  assert.isTrue(
+    await fileExists(`${process.cwd()}/.github/workflows/experimental-release.yml`),
+    'Release workflow is missing'
+  );
 
-  const {on: triggers, jobs} = load(await fs.readFile(`${process.cwd()}/.github/workflows/release.yml`, 'utf-8'));
+  const {on: triggers, jobs} = load(
+    await fs.readFile(`${process.cwd()}/.github/workflows/experimental-release.yml`, 'utf-8')
+  );
 
   return {triggers, jobs};
 }
@@ -68,7 +73,7 @@ Given('no GitHub workflows exist', async function () {
   this.githubWorkflows = false;
 });
 
-Then('the release workflow calls the reusable workflow for alpha branches', async function () {
+Then('the experimental release workflow calls the reusable workflow for alpha branches', async function () {
   const {triggers, jobs} = await loadReleaseWorkflowDefinition();
 
   assert.isUndefined(triggers.workflow_dispatch);
@@ -76,13 +81,19 @@ Then('the release workflow calls the reusable workflow for alpha branches', asyn
   assert.equal(jobs.release.uses, 'form8ion/.github/.github/workflows/release-package.yml@master');
 });
 
-Then('the release workflow calls the reusable workflow for semantic-release v19 for alpha branches', async function () {
-  const {triggers, jobs} = await loadReleaseWorkflowDefinition();
+Then(
+  'the experimental release workflow calls the reusable workflow for semantic-release v19 for alpha branches',
+  async function () {
+    const {triggers, jobs} = await loadReleaseWorkflowDefinition();
 
-  assert.isUndefined(triggers.workflow_dispatch);
-  assert.deepEqual(triggers.push.branches, ['alpha']);
-  assert.equal(jobs.release.uses, 'form8ion/.github/.github/workflows/release-package-semantic-release-19.yml@master');
-});
+    assert.isUndefined(triggers.workflow_dispatch);
+    assert.deepEqual(triggers.push.branches, ['alpha']);
+    assert.equal(
+      jobs.release.uses,
+      'form8ion/.github/.github/workflows/release-package-semantic-release-19.yml@master'
+    );
+  }
+);
 
 Then('the release workflow is not defined', async function () {
   assert.isFalse(await fileExists(`${process.cwd()}/.github/workflows/release.yml`));
