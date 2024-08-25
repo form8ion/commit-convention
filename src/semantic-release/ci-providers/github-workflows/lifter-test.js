@@ -8,7 +8,7 @@ import sinon from 'sinon';
 
 import * as releaseTriggerNeeds from './release-trigger-needs';
 import * as reusableReleaseWorkflow from './reusable-release-workflow';
-import * as releaseWorkflowLifter from './release-workflow-for-alpha/lifter';
+import * as releaseWorkflowLifter from './experimental-release-workflow/lifter';
 import lift from './lifter';
 
 suite('github-workflows lifter for semantic-release', () => {
