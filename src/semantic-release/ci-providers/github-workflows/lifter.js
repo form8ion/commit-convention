@@ -1,6 +1,6 @@
 import {promises as fs} from 'fs';
 import {load} from 'js-yaml';
-import {fileTypes, writeConfigFile} from '@form8ion/core';
+import {writeWorkflowFile} from '@form8ion/github-workflows-core';
 
 import determineTriggerNeedsFrom from './release-trigger-needs';
 import {lift as liftReleaseWorkflow} from './experimental-release-workflow';
@@ -46,10 +46,9 @@ export default async function ({projectRoot, nodeVersion}) {
     }
   };
 
-  await writeConfigFile({
-    format: fileTypes.YAML,
+  await writeWorkflowFile({
+    projectRoot,
     name: 'node-ci',
-    path: workflowsDirectory,
     config: parsedVerificationWorkflowDetails
   });
 }

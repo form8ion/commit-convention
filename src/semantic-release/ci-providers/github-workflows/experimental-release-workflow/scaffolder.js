@@ -1,11 +1,10 @@
-import {fileTypes, writeConfigFile} from '@form8ion/core';
+import {writeWorkflowFile} from '@form8ion/github-workflows-core';
 
 import {determineAppropriateWorkflow} from '../reusable-release-workflow';
 
 export default async function ({projectRoot, nodeVersion}) {
-  await writeConfigFile({
-    format: fileTypes.YAML,
-    path: `${projectRoot}/.github/workflows`,
+  await writeWorkflowFile({
+    projectRoot,
     name: 'experimental-release',
     config: {
       name: 'Release',
