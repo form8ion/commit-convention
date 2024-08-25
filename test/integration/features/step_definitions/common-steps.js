@@ -78,6 +78,15 @@ When('the project is lifted', async function () {
                 jobs: {release: {uses: 'form8ion/.github/.github/workflows/release-package.yml@master'}}
               }
             })
+          },
+          ...this.experimentalReleaseWorkflow && {
+            'experimental-release.yml': dump({
+              ...this.localReleaseWorkflow && {on: {push: {branches: ['alpha']}, workflow_dispatch: {}}},
+              ...this.alphaReleaseWorkflow && {
+                on: {push: {branches: ['alpha']}},
+                jobs: {release: {uses: 'form8ion/.github/.github/workflows/release-package.yml@master'}}
+              }
+            })
           }
         }
       }

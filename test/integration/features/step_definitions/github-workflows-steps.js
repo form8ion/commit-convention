@@ -38,9 +38,9 @@ Given('a local release workflow is defined', async function () {
   this.localReleaseWorkflow = true;
 });
 
-Given('a release workflow is defined for alpha', async function () {
+Given('an experimental release workflow is defined', async function () {
   this.githubWorkflows = true;
-  this.releaseWorkflow = true;
+  this.experimentalReleaseWorkflow = true;
   this.alphaReleaseWorkflow = true;
 });
 

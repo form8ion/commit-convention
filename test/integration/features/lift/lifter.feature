@@ -18,14 +18,14 @@ Feature: Lift
   Scenario: modern semantic-release in GitHub workflows
     Given semantic-release is configured
     And the release workflow is called from the ci workflow
-    And a release workflow is defined for alpha
+    And an experimental release workflow is defined
     When the project is lifted
     Then the experimental release workflow calls the reusable workflow for alpha branches
 
   Scenario: modern semantic-release in GitHub workflows, but trigger does not wait for verification
     Given semantic-release is configured
     And the release workflow is called from the ci workflow
-    And a release workflow is defined for alpha
+    And an experimental release workflow is defined
     When the project is lifted
     Then the experimental release workflow calls the reusable workflow for alpha branches
     And the release is not called until verification completes
@@ -33,7 +33,7 @@ Feature: Lift
   Scenario: modern semantic-release in GitHub workflows verifying multiple node versions, but trigger does not wait for verification
     Given semantic-release is configured
     And the release workflow is called from the ci workflow
-    And a release workflow is defined for alpha
+    And an experimental release workflow is defined
     And multiple node versions are verified
     When the project is lifted
     Then the experimental release workflow calls the reusable workflow for alpha branches
