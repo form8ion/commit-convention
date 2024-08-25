@@ -34,13 +34,19 @@ Given('the cycjimmy action is configured in a GitHub workflow', async function (
 
 Given('a local release workflow is defined', async function () {
   this.githubWorkflows = true;
-  this.releaseWorkflow = true;
+  this.legacyReleaseWorkflow = true;
   this.localReleaseWorkflow = true;
 });
 
 Given('an experimental release workflow is defined', async function () {
   this.githubWorkflows = true;
   this.experimentalReleaseWorkflow = true;
+  this.alphaReleaseWorkflow = true;
+});
+
+Given('a legacy release workflow is defined', async function () {
+  this.githubWorkflows = true;
+  this.legacyReleaseWorkflow = true;
   this.alphaReleaseWorkflow = true;
 });
 
@@ -73,12 +79,21 @@ Given('no GitHub workflows exist', async function () {
   this.githubWorkflows = false;
 });
 
+Given('no conventional verification workflow is defined', async function () {
+  this.githubWorkflows = true;
+  this.verificationWorkflow = false;
+});
+
 Then('the experimental release workflow calls the reusable workflow for alpha branches', async function () {
   const {triggers, jobs} = await loadReleaseWorkflowDefinition();
 
   assert.isUndefined(triggers.workflow_dispatch);
   assert.deepEqual(triggers.push.branches, ['alpha']);
   assert.equal(jobs.release.uses, 'form8ion/.github/.github/workflows/release-package.yml@master');
+});
+
+Then('the legacy experimental release workflow has been renamed', async function () {
+  assert.isFalse(await fileExists(`${process.cwd()}/.github/workflows/release.yml`));
 });
 
 Then(

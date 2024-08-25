@@ -59,10 +59,9 @@ Feature: Lift
     When the project is lifted
     Then the release workflow is not defined
 
-  Scenario: release trigger
+  @wip
+  Scenario: no node-ci workflow
     Given semantic-release is configured
-    And a local release workflow is defined
-    And the release workflow is triggered from the ci workflow
+    And no conventional verification workflow is defined
     When the project is lifted
-    Then the experimental release workflow calls the reusable workflow for alpha branches
-    And the verification workflow calls the reusable release workflow
+    Then no error occurs

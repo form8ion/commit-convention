@@ -22,9 +22,14 @@ async function releaseWorkflowShouldBeScaffolded(pathToReleaseWorkflowFile) {
 
 export default async function ({projectRoot, nodeVersion}) {
   const workflowsDirectory = `${projectRoot}/.github/workflows`;
-  const pathToReleaseWorkflowFile = `${workflowsDirectory}/release.yml`;
+  const pathToExperimentalReleaseWorkflowFile = `${workflowsDirectory}/experimental-release.yml`;
+  const pathToLegacyReleaseWorkflowFile = `${workflowsDirectory}/release.yml`;
 
-  if (await releaseWorkflowShouldBeScaffolded(pathToReleaseWorkflowFile)) {
+  if (await fileExists(pathToLegacyReleaseWorkflowFile)) {
+    await fs.rename(pathToLegacyReleaseWorkflowFile, pathToExperimentalReleaseWorkflowFile);
+  }
+
+  if (await releaseWorkflowShouldBeScaffolded(pathToExperimentalReleaseWorkflowFile)) {
     return scaffolder({projectRoot, nodeVersion});
   }
 

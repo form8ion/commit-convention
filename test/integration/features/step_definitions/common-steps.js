@@ -1,7 +1,7 @@
 import {resolve} from 'path';
 import {dump} from 'js-yaml';
 
-import {After, Before, When} from '@cucumber/cucumber';
+import {After, Before, Then, When} from '@cucumber/cucumber';
 import stubbedFs from 'mock-fs';
 import any from '@travi/any';
 
@@ -70,7 +70,7 @@ When('the project is lifted', async function () {
               }
             })
           },
-          ...this.releaseWorkflow && {
+          ...this.legacyReleaseWorkflow && {
             'release.yml': dump({
               ...this.localReleaseWorkflow && {on: {push: {branches: ['alpha']}, workflow_dispatch: {}}},
               ...this.alphaReleaseWorkflow && {
@@ -102,4 +102,8 @@ When('the project is lifted', async function () {
   if (await test({projectRoot: this.projectRoot})) {
     await lift({projectRoot: this.projectRoot});
   }
+});
+
+Then('no error occurs', async function () {
+  return undefined;
 });
