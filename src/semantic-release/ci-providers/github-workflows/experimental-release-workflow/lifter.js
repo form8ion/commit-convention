@@ -1,5 +1,4 @@
-import {promises as fs} from 'fs';
-import {loadWorkflowFile, workflowFileExists} from '@form8ion/github-workflows-core';
+import {loadWorkflowFile, renameWorkflowFile, workflowFileExists} from '@form8ion/github-workflows-core';
 
 import scaffolder from './scaffolder.js';
 
@@ -20,14 +19,14 @@ async function releaseWorkflowShouldBeScaffolded({projectRoot, name}) {
 }
 
 async function renameLegacyReleaseWorkflow(projectRoot, experimentalReleaseWorkflowName) {
-  const workflowsDirectory = `${projectRoot}/.github/workflows`;
   const legacyReleaseWorkflowName = 'release';
 
   if (await workflowFileExists({projectRoot, name: legacyReleaseWorkflowName})) {
-    await fs.rename(
-      `${workflowsDirectory}/${legacyReleaseWorkflowName}.yml`,
-      `${workflowsDirectory}/${experimentalReleaseWorkflowName}.yml`
-    );
+    await renameWorkflowFile({
+      projectRoot,
+      oldName: legacyReleaseWorkflowName,
+      newName: experimentalReleaseWorkflowName
+    });
   }
 }
 
