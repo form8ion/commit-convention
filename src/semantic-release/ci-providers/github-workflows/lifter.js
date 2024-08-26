@@ -1,6 +1,4 @@
-import {promises as fs} from 'fs';
-import {load} from 'js-yaml';
-import {writeWorkflowFile} from '@form8ion/github-workflows-core';
+import {loadWorkflowFile, writeWorkflowFile} from '@form8ion/github-workflows-core';
 
 import determineTriggerNeedsFrom from './release-trigger-needs.js';
 import {lift as liftReleaseWorkflow} from './experimental-release-workflow/index.js';
@@ -17,11 +15,11 @@ function removeCycjimmyActionFrom(otherJobs) {
 }
 
 export default async function ({projectRoot, nodeVersion}) {
-  const workflowsDirectory = `${projectRoot}/.github/workflows`;
+  const ciWorkflowName = 'node-ci';
 
   await liftReleaseWorkflow({projectRoot, nodeVersion});
 
-  const parsedVerificationWorkflowDetails = load(await fs.readFile(`${workflowsDirectory}/node-ci.yml`, 'utf-8'));
+  const parsedVerificationWorkflowDetails = await loadWorkflowFile({projectRoot, name: ciWorkflowName});
 
   parsedVerificationWorkflowDetails.on.push.branches = [
     ...parsedVerificationWorkflowDetails.on.push.branches.filter(branch => 'alpha' !== branch),
@@ -48,7 +46,7 @@ export default async function ({projectRoot, nodeVersion}) {
 
   await writeWorkflowFile({
     projectRoot,
-    name: 'node-ci',
+    name: ciWorkflowName,
     config: parsedVerificationWorkflowDetails
   });
 }

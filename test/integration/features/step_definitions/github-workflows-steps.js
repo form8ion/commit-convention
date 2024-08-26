@@ -1,19 +1,20 @@
 import {promises as fs} from 'fs';
-import {fileExists} from '@form8ion/core';
+import {loadWorkflowFile, workflowFileExists} from '@form8ion/github-workflows-core';
 
 import {Given, Then} from '@cucumber/cucumber';
 import {assert} from 'chai';
-import {load} from 'js-yaml';
 
-async function loadReleaseWorkflowDefinition() {
+const experimentalReleaseWorkflowName = 'experimental-release';
+const legacyReleaseWorkflowName = 'release';
+const ciWorkflowName = 'node-ci';
+
+async function loadReleaseWorkflowDefinition({projectRoot}) {
   assert.isTrue(
-    await fileExists(`${process.cwd()}/.github/workflows/experimental-release.yml`),
-    'Release workflow is missing'
+    await workflowFileExists({projectRoot, name: experimentalReleaseWorkflowName}),
+    'Experimental-Release workflow is missing'
   );
 
-  const {on: triggers, jobs} = load(
-    await fs.readFile(`${process.cwd()}/.github/workflows/experimental-release.yml`, 'utf-8')
-  );
+  const {on: triggers, jobs} = await loadWorkflowFile({projectRoot, name: experimentalReleaseWorkflowName});
 
   return {triggers, jobs};
 }
@@ -85,7 +86,7 @@ Given('no conventional verification workflow is defined', async function () {
 });
 
 Then('the experimental release workflow calls the reusable workflow for alpha branches', async function () {
-  const {triggers, jobs} = await loadReleaseWorkflowDefinition();
+  const {triggers, jobs} = await loadReleaseWorkflowDefinition({projectRoot: this.projectRoot});
 
   assert.isUndefined(triggers.workflow_dispatch);
   assert.deepEqual(triggers.push.branches, ['alpha']);
@@ -93,13 +94,13 @@ Then('the experimental release workflow calls the reusable workflow for alpha br
 });
 
 Then('the legacy experimental release workflow has been renamed', async function () {
-  assert.isFalse(await fileExists(`${process.cwd()}/.github/workflows/release.yml`));
+  assert.isFalse(await workflowFileExists({projectRoot: this.projectRoot, name: legacyReleaseWorkflowName}));
 });
 
 Then(
   'the experimental release workflow calls the reusable workflow for semantic-release v19 for alpha branches',
   async function () {
-    const {triggers, jobs} = await loadReleaseWorkflowDefinition();
+    const {triggers, jobs} = await loadReleaseWorkflowDefinition({projectRoot: this.projectRoot});
 
     assert.isUndefined(triggers.workflow_dispatch);
     assert.deepEqual(triggers.push.branches, ['alpha']);
@@ -111,14 +112,11 @@ Then(
 );
 
 Then('the release workflow is not defined', async function () {
-  assert.isFalse(await fileExists(`${process.cwd()}/.github/workflows/release.yml`));
+  assert.isFalse(await workflowFileExists({projectRoot: this.projectRoot, name: experimentalReleaseWorkflowName}));
 });
 
 Then('the verification workflow calls the reusable release workflow', async function () {
-  const verificationWorkflowDefinition = load(await fs.readFile(
-    `${process.cwd()}/.github/workflows/node-ci.yml`,
-    'utf-8'
-  ));
+  const verificationWorkflowDefinition = await loadWorkflowFile({projectRoot: this.projectRoot, name: ciWorkflowName});
   const branchTriggers = verificationWorkflowDefinition.on.push.branches;
 
   assert.include(branchTriggers, 'master');
@@ -148,10 +146,7 @@ Then('the verification workflow calls the reusable release workflow', async func
 });
 
 Then('the verification workflow calls the reusable release workflow for semantic-release v19', async function () {
-  const verificationWorkflowDefinition = load(await fs.readFile(
-    `${process.cwd()}/.github/workflows/node-ci.yml`,
-    'utf-8'
-  ));
+  const verificationWorkflowDefinition = await loadWorkflowFile({projectRoot: this.projectRoot, name: ciWorkflowName});
   const branchTriggers = verificationWorkflowDefinition.on.push.branches;
 
   assert.include(branchTriggers, 'master');
@@ -172,19 +167,13 @@ Then('the verification workflow calls the reusable release workflow for semantic
 });
 
 Then('the verification workflow does not trigger the release workflow', async function () {
-  const verificationWorkflowDefinition = load(await fs.readFile(
-    `${process.cwd()}/.github/workflows/node-ci.yml`,
-    'utf-8'
-  ));
+  const verificationWorkflowDefinition = await loadWorkflowFile({projectRoot: this.projectRoot, name: ciWorkflowName});
 
   assert.isUndefined(verificationWorkflowDefinition.jobs['trigger-release']);
 });
 
 Then('the release is not called until verification completes', async function () {
-  const verificationWorkflowDefinition = load(await fs.readFile(
-    `${process.cwd()}/.github/workflows/node-ci.yml`,
-    'utf-8'
-  ));
+  const verificationWorkflowDefinition = await loadWorkflowFile({projectRoot: this.projectRoot, name: ciWorkflowName});
   const triggerReleaseJob = verificationWorkflowDefinition.jobs.release;
 
   assert.include(triggerReleaseJob.needs, 'verify');
