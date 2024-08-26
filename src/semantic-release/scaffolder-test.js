@@ -4,7 +4,7 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 import any from '@travi/any';
 
-import scaffoldSemanticRelease from './scaffolder';
+import scaffoldSemanticRelease from './scaffolder.js';
 
 suite('semantic-release scaffolder', () => {
   let sandbox;

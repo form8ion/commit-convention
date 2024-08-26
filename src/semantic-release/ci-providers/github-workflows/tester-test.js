@@ -3,7 +3,7 @@ import core from '@form8ion/core';
 import any from '@travi/any';
 import sinon from 'sinon';
 import {assert} from 'chai';
-import projectUsesGithubWorkflows from './tester';
+import projectUsesGithubWorkflows from './tester.js';
 
 suite('GitHub workflows predicate', () => {
   const projectRoot = any.string();

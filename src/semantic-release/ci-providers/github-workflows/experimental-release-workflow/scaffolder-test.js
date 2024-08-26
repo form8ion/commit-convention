@@ -5,8 +5,8 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 import any from '@travi/any';
 
-import * as reusableWorkflow from '../reusable-release-workflow';
-import scaffoldReleaseWorkflow from './scaffolder';
+import * as reusableWorkflow from '../reusable-release-workflow.js';
+import scaffoldReleaseWorkflow from './scaffolder.js';
 
 suite('github release workflow scaffolder', () => {
   let sandbox;

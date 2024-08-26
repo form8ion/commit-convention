@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import any from '@travi/any';
 
-import {determineAppropriateWorkflow} from './reusable-release-workflow';
+import {determineAppropriateWorkflow} from './reusable-release-workflow.js';
 
 suite('reusable release workflow', () => {
   test('that the reusable workflow is defined for semantic-release\'s minimum node version', async () => {

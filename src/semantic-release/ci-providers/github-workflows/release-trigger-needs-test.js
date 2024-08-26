@@ -1,6 +1,6 @@
 import {assert} from 'chai';
 import any from '@travi/any';
-import determineTriggerNeedsFrom from './release-trigger-needs';
+import determineTriggerNeedsFrom from './release-trigger-needs.js';
 
 suite('release-trigger needs', () => {
   test('that no jobs are listed if neither `verify` nor `verify-matrix` are present in `jobs`', async () => {

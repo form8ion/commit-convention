@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import {assert} from 'chai';
 import any from '@travi/any';
 
-import determineIfSemanticReleaseIsConfigured from './tester';
+import determineIfSemanticReleaseIsConfigured from './tester.js';
 
 suite('semantic-release predicate', () => {
   let sandbox;

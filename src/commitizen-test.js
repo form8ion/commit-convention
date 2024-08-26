@@ -1,8 +1,10 @@
-import {promises as fsPromises} from 'fs';
+import {promises as fsPromises} from 'node:fs';
+
 import sinon from 'sinon';
 import {assert} from 'chai';
 import any from '@travi/any';
-import scaffold from './commitizen';
+
+import scaffold from './commitizen.js';
 
 suite('commitizen', () => {
   let sandbox;

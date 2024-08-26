@@ -4,7 +4,7 @@ import {afterEach, describe, expect, it, vi} from 'vitest';
 import any from '@travi/any';
 import {when} from 'jest-when';
 
-import testForCommitlint from './tester';
+import testForCommitlint from './tester.js';
 
 vi.mock('@form8ion/core');
 

@@ -2,8 +2,8 @@ import {assert} from 'chai';
 import any from '@travi/any';
 import sinon from 'sinon';
 
-import * as semanticReleaseTester from './semantic-release/tester';
-import testForCommitConvention from './tester';
+import * as semanticReleaseTester from './semantic-release/tester.js';
+import testForCommitConvention from './tester.js';
 
 suite('predicate', () => {
   const projectRoot = any.string();
