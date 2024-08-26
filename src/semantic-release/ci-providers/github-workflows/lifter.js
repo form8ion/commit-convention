@@ -2,9 +2,9 @@ import {promises as fs} from 'fs';
 import {load} from 'js-yaml';
 import {writeWorkflowFile} from '@form8ion/github-workflows-core';
 
-import determineTriggerNeedsFrom from './release-trigger-needs';
-import {lift as liftReleaseWorkflow} from './experimental-release-workflow';
-import {determineAppropriateWorkflow} from './reusable-release-workflow';
+import determineTriggerNeedsFrom from './release-trigger-needs.js';
+import {lift as liftReleaseWorkflow} from './experimental-release-workflow/index.js';
+import {determineAppropriateWorkflow} from './reusable-release-workflow.js';
 
 function removeCycjimmyActionFrom(otherJobs) {
   return Object.fromEntries(Object.entries(otherJobs).map(([jobName, job]) => [

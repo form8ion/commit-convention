@@ -5,10 +5,10 @@ import sinon from 'sinon';
 import any from '@travi/any';
 import {assert} from 'chai';
 
-import * as semanticReleaseScaffolder from './semantic-release/scaffolder';
-import * as commitizenScaffolder from './commitizen';
-import * as commitlintScaffolder from './commitlint/scaffolder';
-import scaffoldCommitConvention from './scaffolder';
+import * as semanticReleaseScaffolder from './semantic-release/scaffolder.js';
+import * as commitizenScaffolder from './commitizen.js';
+import * as commitlintScaffolder from './commitlint/scaffolder.js';
+import scaffoldCommitConvention from './scaffolder.js';
 
 suite('commit-convention scaffolder', () => {
   let sandbox;

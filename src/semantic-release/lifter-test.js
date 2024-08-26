@@ -4,9 +4,9 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 import any from '@travi/any';
 
-import * as githubWorkflowsTester from './ci-providers/github-workflows/tester';
-import * as githubWorkflowsLifter from './ci-providers/github-workflows/lifter';
-import lift from './lifter';
+import * as githubWorkflowsTester from './ci-providers/github-workflows/tester.js';
+import * as githubWorkflowsLifter from './ci-providers/github-workflows/lifter.js';
+import lift from './lifter.js';
 
 suite('semantic-release lifter', () => {
   let sandbox;

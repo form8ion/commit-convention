@@ -6,8 +6,8 @@ import any from '@travi/any';
 import sinon from 'sinon';
 import {assert} from 'chai';
 
-import * as scaffolder from './scaffolder';
-import lift from './lifter';
+import * as scaffolder from './scaffolder.js';
+import lift from './lifter.js';
 
 suite('release workflow lifter', () => {
   let sandbox;

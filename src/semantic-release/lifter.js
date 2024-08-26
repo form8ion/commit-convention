@@ -1,6 +1,6 @@
 import {promises as fs} from 'fs';
 
-import {test as ciProviderCanBeLifted, lift as liftCiProvider} from './ci-providers';
+import {test as ciProviderCanBeLifted, lift as liftCiProvider} from './ci-providers/index.js';
 
 export default async function ({projectRoot}) {
   if (await ciProviderCanBeLifted({projectRoot})) {

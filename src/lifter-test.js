@@ -2,9 +2,9 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 import any from '@travi/any';
 
-import * as semanticReleaseTester from './semantic-release/tester';
-import * as semanticReleaseLifter from './semantic-release/lifter';
-import lift from './lifter';
+import * as semanticReleaseTester from './semantic-release/tester.js';
+import * as semanticReleaseLifter from './semantic-release/lifter.js';
+import lift from './lifter.js';
 
 suite('lifter', () => {
   let sandbox;

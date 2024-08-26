@@ -6,10 +6,10 @@ import any from '@travi/any';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import * as releaseTriggerNeeds from './release-trigger-needs';
-import * as reusableReleaseWorkflow from './reusable-release-workflow';
-import * as releaseWorkflowLifter from './experimental-release-workflow/lifter';
-import lift from './lifter';
+import * as releaseTriggerNeeds from './release-trigger-needs.js';
+import * as reusableReleaseWorkflow from './reusable-release-workflow.js';
+import * as releaseWorkflowLifter from './experimental-release-workflow/lifter.js';
+import lift from './lifter.js';
 
 suite('github-workflows lifter for semantic-release', () => {
   let sandbox;

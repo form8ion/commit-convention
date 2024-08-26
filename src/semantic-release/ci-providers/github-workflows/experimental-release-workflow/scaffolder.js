@@ -1,6 +1,6 @@
 import {writeWorkflowFile} from '@form8ion/github-workflows-core';
 
-import {determineAppropriateWorkflow} from '../reusable-release-workflow';
+import {determineAppropriateWorkflow} from '../reusable-release-workflow.js';
 
 export default async function ({projectRoot, nodeVersion}) {
   await writeWorkflowFile({

@@ -5,7 +5,7 @@ import any from '@travi/any';
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import scaffoldCommitlint from './scaffolder';
+import scaffoldCommitlint from './scaffolder.js';
 
 suite('commitlint scaffolder', () => {
   let sandbox;

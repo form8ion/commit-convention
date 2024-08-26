@@ -2,7 +2,7 @@ import {promises as fs} from 'fs';
 import {load} from 'js-yaml';
 import {fileExists} from '@form8ion/core';
 
-import scaffolder from './scaffolder';
+import scaffolder from './scaffolder.js';
 
 function workflowPermissionsAreMinimal(existingContents) {
   return existingContents.permissions
