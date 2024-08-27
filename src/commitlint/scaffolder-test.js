@@ -1,5 +1,5 @@
 import {fileTypes} from '@form8ion/core';
-import * as configFile from '@form8ion/config-file';
+import configFile from '@form8ion/config-file';
 
 import any from '@travi/any';
 import {assert} from 'chai';
