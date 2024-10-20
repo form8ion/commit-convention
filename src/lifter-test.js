@@ -1,9 +1,10 @@
+import core from '@form8ion/core';
+
 import {assert} from 'chai';
 import sinon from 'sinon';
 import any from '@travi/any';
 
-import * as semanticReleaseTester from './semantic-release/tester.js';
-import * as semanticReleaseLifter from './semantic-release/lifter.js';
+import * as semanticReleasePlugin from './semantic-release/index.js';
 import lift from './lifter.js';
 
 suite('lifter', () => {
@@ -13,23 +14,17 @@ suite('lifter', () => {
   setup(() => {
     sandbox = sinon.createSandbox();
 
-    sandbox.stub(semanticReleaseTester, 'default');
-    sandbox.stub(semanticReleaseLifter, 'default');
+    sandbox.stub(core, 'applyEnhancers');
   });
 
   teardown(() => sandbox.restore());
 
-  test('that the sublifters are executed', async () => {
-    const semanticReleaseResults = any.simpleObject();
-    semanticReleaseTester.default.withArgs({projectRoot}).resolves(true);
-    semanticReleaseLifter.default.withArgs({projectRoot}).resolves(semanticReleaseResults);
+  test('that the enhancers are applied', async () => {
+    const enhancerResults = any.simpleObject();
+    core.applyEnhancers
+      .withArgs({options: {projectRoot}, enhancers: {'semantic-release': semanticReleasePlugin}})
+      .resolves(enhancerResults);
 
-    assert.deepEqual(await lift({projectRoot}), semanticReleaseResults);
-  });
-
-  test('that the semantic-release lifter is not executed if not in use for the project', async () => {
-    semanticReleaseTester.default.withArgs({projectRoot}).resolves(false);
-
-    assert.deepEqual(await lift({projectRoot}), {});
+    assert.deepEqual(await lift({projectRoot}), enhancerResults);
   });
 });
