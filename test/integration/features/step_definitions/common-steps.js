@@ -103,7 +103,7 @@ When('the project is lifted', async function () {
   });
 
   if (await test({projectRoot: this.projectRoot})) {
-    await lift({projectRoot: this.projectRoot});
+    await lift({projectRoot: this.projectRoot, configs: {commitlint: {name: this.commilintConfigName}}});
   }
 });
 

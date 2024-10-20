@@ -13,10 +13,11 @@ vi.mock('@form8ion/core');
 describe('lifter', () => {
   it('should apply the enhancers', async () => {
     const projectRoot = any.string();
+    const configs = any.simpleObject();
     const enhancerResults = any.simpleObject();
     when(applyEnhancers)
       .calledWith({
-        options: {projectRoot},
+        options: {projectRoot, configs},
         enhancers: {
           'semantic-release': semanticReleasePlugin,
           commitlint: commitlintPlugin
@@ -24,6 +25,6 @@ describe('lifter', () => {
       })
       .mockResolvedValue(enhancerResults);
 
-    expect(await lift({projectRoot})).toEqual(enhancerResults);
+    expect(await lift({projectRoot, configs})).toEqual(enhancerResults);
   });
 });
