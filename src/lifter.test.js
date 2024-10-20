@@ -5,6 +5,7 @@ import {describe, expect, it, vi} from 'vitest';
 import {when} from 'jest-when';
 
 import * as semanticReleasePlugin from './semantic-release/index.js';
+import * as commitlintPlugin from './commitlint/index.js';
 import lift from './lifter.js';
 
 vi.mock('@form8ion/core');
@@ -14,7 +15,13 @@ describe('lifter', () => {
     const projectRoot = any.string();
     const enhancerResults = any.simpleObject();
     when(applyEnhancers)
-      .calledWith({options: {projectRoot}, enhancers: {'semantic-release': semanticReleasePlugin}})
+      .calledWith({
+        options: {projectRoot},
+        enhancers: {
+          'semantic-release': semanticReleasePlugin,
+          commitlint: commitlintPlugin
+        }
+      })
       .mockResolvedValue(enhancerResults);
 
     expect(await lift({projectRoot})).toEqual(enhancerResults);
