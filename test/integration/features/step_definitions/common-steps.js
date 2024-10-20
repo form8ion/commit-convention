@@ -96,7 +96,10 @@ When('the project is lifted', async function () {
     'package.json': JSON.stringify({
       ...any.simpleObject(),
       ...this.semanticReleaseConfigured && {version: '0.0.0-semantically-released'}
-    })
+    }),
+    ...this.commitlintConfigExtension && {
+      [`.commitlintrc.${this.commitlintConfigExtension}`]: JSON.stringify(any.simpleObject())
+    }
   });
 
   if (await test({projectRoot: this.projectRoot})) {
