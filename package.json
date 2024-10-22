@@ -68,7 +68,7 @@
     "deepmerge": "^4.2.2"
   },
   "devDependencies": {
-    "@babel/register": "7.25.7",
+    "@babel/register": "7.25.9",
     "@cucumber/cucumber": "10.9.0",
     "@form8ion/babel-preset": "1.6.137",
     "@form8ion/commitlint-config": "2.0.0",
