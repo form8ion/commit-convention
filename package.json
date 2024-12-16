@@ -77,7 +77,7 @@
     "@form8ion/eslint-config-mocha": "3.0.6",
     "@form8ion/remark-lint-preset": "6.0.5",
     "@rollup/plugin-babel": "6.0.4",
-    "@rollup/plugin-node-resolve": "15.3.1",
+    "@rollup/plugin-node-resolve": "16.0.0",
     "@travi/any": "3.1.2",
     "babel-plugin-istanbul": "7.0.0",
     "ban-sensitive-files": "1.10.7",
