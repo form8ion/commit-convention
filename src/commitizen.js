@@ -7,7 +7,7 @@ export default async function ({projectRoot}) {
   );
 
   return {
-    devDependencies: ['cz-conventional-changelog'],
+    dependencies: {javascript: {development: ['cz-conventional-changelog']}},
     badges: {
       contribution: {
         commitizen: {

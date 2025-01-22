@@ -30,7 +30,7 @@ suite('commitizen', () => {
     assert.deepEqual(
       result,
       {
-        devDependencies: ['cz-conventional-changelog'],
+        dependencies: {javascript: {development: ['cz-conventional-changelog']}},
         badges: {
           contribution: {
             commitizen: {

@@ -9,5 +9,5 @@ export default async function ({config, projectRoot}) {
     config: {extends: [config.name]}
   });
 
-  return {devDependencies: [config.packageName]};
+  return {dependencies: {javascript: {development: [config.packageName]}}};
 }
