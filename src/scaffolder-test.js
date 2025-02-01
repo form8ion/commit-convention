@@ -6,7 +6,7 @@ import any from '@travi/any';
 import {assert} from 'chai';
 
 import * as semanticReleaseScaffolder from './semantic-release/scaffolder.js';
-import * as commitizenScaffolder from './commitizen.js';
+import * as commitizenScaffolder from './commitizen/scaffolder.js';
 import * as commitlintScaffolder from './commitlint/scaffolder.js';
 import scaffoldCommitConvention from './scaffolder.js';
 

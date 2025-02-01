@@ -3,7 +3,7 @@ import {promises as fs} from 'node:fs';
 import any from '@travi/any';
 import {it, describe, vi, expect} from 'vitest';
 
-import scaffold from './commitizen.js';
+import scaffold from './scaffolder.js';
 
 vi.mock('node:fs');
 
