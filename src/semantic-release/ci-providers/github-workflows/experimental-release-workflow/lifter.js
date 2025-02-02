@@ -1,6 +1,6 @@
 import {loadWorkflowFile, renameWorkflowFile, workflowFileExists} from '@form8ion/github-workflows-core';
 
-import scaffolder from './scaffolder.js';
+import scaffoldWorkflow from './scaffolder.js';
 
 function workflowPermissionsAreMinimal(existingContents) {
   return existingContents.permissions
@@ -36,7 +36,7 @@ export default async function ({projectRoot, nodeVersion}) {
   await renameLegacyReleaseWorkflow(projectRoot, experimentalReleaseWorkflowName);
 
   if (await releaseWorkflowShouldBeScaffolded({projectRoot, name: experimentalReleaseWorkflowName})) {
-    return scaffolder({projectRoot, nodeVersion});
+    return scaffoldWorkflow({projectRoot, nodeVersion});
   }
 
   return undefined;
