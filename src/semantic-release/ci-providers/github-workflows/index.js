@@ -1,3 +1,3 @@
 export {default as scaffold} from './experimental-release-workflow/scaffolder.js';
-export {default as test} from './tester.js';
+export {test} from '@form8ion/github-workflows-core';
 export {default as lift} from './lifter.js';

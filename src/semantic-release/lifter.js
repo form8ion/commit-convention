@@ -1,4 +1,4 @@
-import {promises as fs} from 'fs';
+import {promises as fs} from 'node:fs';
 
 import {test as ciProviderCanBeLifted, lift as liftCiProvider} from './ci-providers/index.js';
 
