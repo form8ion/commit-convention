@@ -1,5 +1,6 @@
 import {loadWorkflowFile, renameWorkflowFile, workflowFileExists} from '@form8ion/github-workflows-core';
 
+import {determineAppropriateWorkflow} from '../reusable-release-workflow.js';
 import scaffoldWorkflow from './scaffolder.js';
 
 function workflowPermissionsAreMinimal(existingContents) {
@@ -8,14 +9,23 @@ function workflowPermissionsAreMinimal(existingContents) {
     && 'read' === existingContents.permissions.contents;
 }
 
-async function contentsNeedToBeUpdated({projectRoot, name}) {
-  const existingContents = await loadWorkflowFile({projectRoot, name});
-
-  return existingContents.on.workflow_dispatch || !workflowPermissionsAreMinimal(existingContents);
+function reusableWorkflowVersionAppropriateForNodeVersion({nodeVersion, reusableWorkflow}) {
+  return reusableWorkflow === determineAppropriateWorkflow(nodeVersion);
 }
 
-async function releaseWorkflowShouldBeScaffolded({projectRoot, name}) {
-  return !await workflowFileExists({projectRoot, name}) || contentsNeedToBeUpdated({projectRoot, name});
+async function contentsNeedToBeUpdated({projectRoot, name, nodeVersion}) {
+  const existingContents = await loadWorkflowFile({projectRoot, name});
+
+  return existingContents.on.workflow_dispatch
+    || !workflowPermissionsAreMinimal(existingContents)
+    || !reusableWorkflowVersionAppropriateForNodeVersion({
+      nodeVersion,
+      reusableWorkflow: existingContents.jobs.release.uses
+    });
+}
+
+async function releaseWorkflowShouldBeScaffolded({projectRoot, name, nodeVersion}) {
+  return !await workflowFileExists({projectRoot, name}) || contentsNeedToBeUpdated({projectRoot, name, nodeVersion});
 }
 
 async function renameLegacyReleaseWorkflow(projectRoot, experimentalReleaseWorkflowName) {
@@ -35,7 +45,7 @@ export default async function ({projectRoot, nodeVersion}) {
 
   await renameLegacyReleaseWorkflow(projectRoot, experimentalReleaseWorkflowName);
 
-  if (await releaseWorkflowShouldBeScaffolded({projectRoot, name: experimentalReleaseWorkflowName})) {
+  if (await releaseWorkflowShouldBeScaffolded({projectRoot, name: experimentalReleaseWorkflowName, nodeVersion})) {
     return scaffoldWorkflow({projectRoot, nodeVersion});
   }
 

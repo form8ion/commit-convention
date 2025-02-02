@@ -4,10 +4,12 @@ import any from '@travi/any';
 import {it, describe, vi, expect, beforeEach} from 'vitest';
 import {when} from 'jest-when';
 
+import {determineAppropriateWorkflow} from '../reusable-release-workflow.js';
 import scaffoldWorkflow from './scaffolder.js';
 import lift from './lifter.js';
 
 vi.mock('@form8ion/github-workflows-core');
+vi.mock('../reusable-release-workflow.js');
 vi.mock('./scaffolder.js');
 
 const experimentalReleaseWorkflowName = 'experimental-release';
@@ -15,10 +17,14 @@ const experimentalReleaseWorkflowName = 'experimental-release';
 describe('experimental release workflow lifter', () => {
   const projectRoot = any.string();
   const nodeVersion = any.string();
+  const appropriateReusableReleaseWorkflowVersion = any.string();
   const scaffoldResults = any.simpleObject();
 
   beforeEach(() => {
     when(scaffoldWorkflow).calledWith({projectRoot, nodeVersion}).mockResolvedValue(scaffoldResults);
+    when(determineAppropriateWorkflow)
+      .calledWith(nodeVersion)
+      .mockReturnValue(appropriateReusableReleaseWorkflowVersion);
   });
 
   it('should call the scaffolder when the experimental release workflow does not exist', async () => {
@@ -32,7 +38,11 @@ describe('experimental release workflow lifter', () => {
     when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
-      .mockResolvedValue({on: {workflow_dispatch: {}}, permissions: {contents: 'read'}});
+      .mockResolvedValue({
+        on: {workflow_dispatch: {}},
+        permissions: {contents: 'read'},
+        jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
+      });
 
     expect(await lift({projectRoot, nodeVersion})).toEqual(scaffoldResults);
     expect(renameWorkflowFile).not.toHaveBeenCalled();
@@ -40,7 +50,10 @@ describe('experimental release workflow lifter', () => {
 
   it('should re-run the scaffolder when permissions have not been restricted', async () => {
     when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
-    when(loadWorkflowFile).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue({on: {}});
+    when(loadWorkflowFile).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue({
+      on: {},
+      jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
+    });
 
     expect(await lift({projectRoot, nodeVersion})).toEqual(scaffoldResults);
     expect(renameWorkflowFile).not.toHaveBeenCalled();
@@ -50,7 +63,11 @@ describe('experimental release workflow lifter', () => {
     when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
-      .mockResolvedValue({on: {}, permissions: any.simpleObject()});
+      .mockResolvedValue({
+        on: {},
+        permissions: any.simpleObject(),
+        jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
+      });
 
     expect(await lift({projectRoot, nodeVersion})).toEqual(scaffoldResults);
     expect(renameWorkflowFile).not.toHaveBeenCalled();
@@ -60,7 +77,11 @@ describe('experimental release workflow lifter', () => {
     when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
-      .mockResolvedValue({on: {}, permissions: {contents: 'write'}});
+      .mockResolvedValue({
+        on: {},
+        permissions: {contents: 'write'},
+        jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
+      });
 
     expect(await lift({projectRoot, nodeVersion})).toEqual(scaffoldResults);
     expect(renameWorkflowFile).not.toHaveBeenCalled();
@@ -70,9 +91,28 @@ describe('experimental release workflow lifter', () => {
     when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
-      .mockResolvedValue({on: {}, permissions: {contents: 'read'}});
+      .mockResolvedValue({
+        on: {},
+        permissions: {contents: 'read'},
+        jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
+      });
 
     expect(await lift({projectRoot, nodeVersion})).toBe(undefined);
+    expect(renameWorkflowFile).not.toHaveBeenCalled();
+  });
+
+  it('should re-run the scaffolder when an inappropriate version of the reusable workflow is referenced', async () => {
+    const inappropriateReusableReleaseWorkflowVersion = any.string();
+    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
+    when(loadWorkflowFile)
+      .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
+      .mockResolvedValue({
+        on: {},
+        permissions: {contents: 'read'},
+        jobs: {release: {uses: inappropriateReusableReleaseWorkflowVersion}}
+      });
+
+    expect(await lift({projectRoot, nodeVersion})).toEqual(scaffoldResults);
     expect(renameWorkflowFile).not.toHaveBeenCalled();
   });
 
@@ -81,7 +121,15 @@ describe('experimental release workflow lifter', () => {
     when(workflowFileExists).calledWith({projectRoot, name: legacyReleaseWorkflowName}).mockResolvedValue(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: legacyReleaseWorkflowName})
-      .mockResolvedValue({on: {}, permissions: {contents: 'read'}});
+      .mockResolvedValue(any.simpleObject());
+    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
+    when(loadWorkflowFile)
+      .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
+      .mockResolvedValue({
+        on: {},
+        permissions: {contents: 'read'},
+        jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
+      });
 
     expect(await lift({projectRoot, nodeVersion})).toBe(undefined);
     expect(renameWorkflowFile).toHaveBeenCalledWith({
