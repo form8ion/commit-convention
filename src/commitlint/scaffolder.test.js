@@ -15,7 +15,7 @@ describe('commitlint scaffolder', () => {
     const projectRoot = any.string();
 
     expect(await scaffoldCommitlint({projectRoot, config: {packageName: configPackageName, name: configName}}))
-      .toEqual({devDependencies: [configPackageName]});
+      .toEqual({dependencies: {javascript: {development: [configPackageName]}}});
     expect(writeConfigFile).toHaveBeenCalledWith({
       format: fileTypes.JSON,
       name: 'commitlint',

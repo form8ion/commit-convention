@@ -2,7 +2,7 @@ import deepmerge from 'deepmerge';
 import {projectTypes} from '@form8ion/javascript-core';
 
 import {scaffold as scaffoldSemanticRelease} from './semantic-release/index.js';
-import scaffoldCommitizen from './commitizen.js';
+import {scaffold as scaffoldCommitizen} from './commitizen/index.js';
 import {scaffold as scaffoldCommitlint} from './commitlint/index.js';
 
 export default async function ({projectRoot, projectType, configs, pathWithinParent}) {

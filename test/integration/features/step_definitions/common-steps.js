@@ -1,10 +1,12 @@
-import {resolve} from 'path';
+import {resolve, dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {dump} from 'js-yaml';
 
 import {After, Before, Then, When} from '@cucumber/cucumber';
 import stubbedFs from 'mock-fs';
 import any from '@travi/any';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));          // eslint-disable-line no-underscore-dangle
 const stubbedNodeModules = stubbedFs.load(resolve(__dirname, '..', '..', '..', '..', 'node_modules'));
 
 Before(function () {
@@ -18,7 +20,7 @@ After(function () {
 
 When('the project is scaffolded', async function () {
   // eslint-disable-next-line import/no-extraneous-dependencies,import/no-unresolved
-  const {scaffold} = require('@form8ion/commit-convention');
+  const {scaffold} = await import('@form8ion/commit-convention');
 
   stubbedFs({node_modules: stubbedNodeModules});
 
@@ -27,7 +29,7 @@ When('the project is scaffolded', async function () {
 
 When('the project is lifted', async function () {
   // eslint-disable-next-line import/no-extraneous-dependencies,import/no-unresolved
-  const {test, lift} = require('@form8ion/commit-convention');
+  const {test, lift} = await import('@form8ion/commit-convention');
 
   stubbedFs({
     ...this.githubWorkflows && {
@@ -92,7 +94,7 @@ When('the project is lifted', async function () {
       }
     },
     node_modules: stubbedNodeModules,
-    '.nvmrc': `${this.projectNodeVersion || 18}`,
+    '.nvmrc': `${this.projectNodeVersion || 20}`,
     'package.json': JSON.stringify({
       ...any.simpleObject(),
       ...this.semanticReleaseConfigured && {version: '0.0.0-semantically-released'}

@@ -1,13 +1,13 @@
-import {promises as fsPromises} from 'fs';
+import {promises as fs} from 'node:fs';
 
 export default async function ({projectRoot}) {
-  await fsPromises.writeFile(
+  await fs.writeFile(
     `${projectRoot}/.czrc`,
     JSON.stringify({path: './node_modules/cz-conventional-changelog'})
   );
 
   return {
-    devDependencies: ['cz-conventional-changelog'],
+    dependencies: {javascript: {development: ['cz-conventional-changelog']}},
     badges: {
       contribution: {
         commitizen: {
