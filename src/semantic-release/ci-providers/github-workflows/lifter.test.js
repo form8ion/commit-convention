@@ -2,7 +2,7 @@ import {loadWorkflowFile, writeWorkflowFile} from '@form8ion/github-workflows-co
 
 import any from '@travi/any';
 import {it, vi, describe, expect, beforeEach} from 'vitest';
-import {when} from 'jest-when';
+import {when} from 'vitest-when';
 
 import determineTriggerNeedsFrom from './release-trigger-needs.js';
 import {lift as liftReleaseWorkflow} from './experimental-release-workflow/index.js';
@@ -40,15 +40,15 @@ describe('github-workflows lifter for semantic-release', () => {
   };
 
   beforeEach(() => {
-    when(determineAppropriateWorkflow).calledWith(nodeVersion).mockReturnValue(reusableReleaseWorkflowReference);
+    when(determineAppropriateWorkflow).calledWith(nodeVersion).thenReturn(reusableReleaseWorkflowReference);
   });
 
   it('should replace the legacy job', async () => {
     const existingJobs = {...jobs, release: legacyReleaseJob};
-    when(determineTriggerNeedsFrom).calledWith(existingJobs).mockReturnValue(neededJobsToTriggerRelease);
+    when(determineTriggerNeedsFrom).calledWith(existingJobs).thenReturn(neededJobsToTriggerRelease);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: ciWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'alpha', 'beta', ...moreBranchTriggers]}},
         jobs: existingJobs
@@ -70,10 +70,10 @@ describe('github-workflows lifter for semantic-release', () => {
 
   it('should replace the dispatch job', async () => {
     const existingJobs = {...jobs, release: legacyReleaseJob};
-    when(determineTriggerNeedsFrom).calledWith(jobs).mockReturnValue(neededJobsToTriggerRelease);
+    when(determineTriggerNeedsFrom).calledWith(existingJobs).thenReturn(neededJobsToTriggerRelease);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: ciWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'alpha', 'beta', ...moreBranchTriggers]}},
         jobs: existingJobs
@@ -95,10 +95,10 @@ describe('github-workflows lifter for semantic-release', () => {
 
   it('should leave a modern job as-is', async () => {
     const existingJobs = {...jobs, release: modernReleaseJobDefinition};
-    when(determineTriggerNeedsFrom).calledWith(existingJobs).mockReturnValue(neededJobsToTriggerRelease);
+    when(determineTriggerNeedsFrom).calledWith(existingJobs).thenReturn(neededJobsToTriggerRelease);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: ciWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
         jobs: existingJobs
@@ -129,10 +129,10 @@ describe('github-workflows lifter for semantic-release', () => {
         ]
       }
     };
-    when(determineTriggerNeedsFrom).calledWith(existingJobs).mockReturnValue(neededJobsToTriggerRelease);
+    when(determineTriggerNeedsFrom).calledWith(existingJobs).thenReturn(neededJobsToTriggerRelease);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: ciWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'alpha', 'beta', ...moreBranchTriggers]}},
         jobs: existingJobs
@@ -156,10 +156,10 @@ describe('github-workflows lifter for semantic-release', () => {
   });
 
   it('should add the release trigger when no release is configured yet', async () => {
-    when(determineTriggerNeedsFrom).calledWith(jobs).mockReturnValue(neededJobsToTriggerRelease);
+    when(determineTriggerNeedsFrom).calledWith(jobs).thenReturn(neededJobsToTriggerRelease);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: ciWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, ...moreBranchTriggers]}},
         jobs

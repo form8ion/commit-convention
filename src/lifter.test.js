@@ -2,7 +2,7 @@ import {applyEnhancers} from '@form8ion/core';
 
 import any from '@travi/any';
 import {describe, expect, it, vi} from 'vitest';
-import {when} from 'jest-when';
+import {when} from 'vitest-when';
 
 import * as semanticReleasePlugin from './semantic-release/index.js';
 import * as commitlintPlugin from './commitlint/index.js';
@@ -23,7 +23,7 @@ describe('lifter', () => {
           commitlint: commitlintPlugin
         }
       })
-      .mockResolvedValue(enhancerResults);
+      .thenResolve(enhancerResults);
 
     expect(await lift({projectRoot, configs})).toEqual(enhancerResults);
   });

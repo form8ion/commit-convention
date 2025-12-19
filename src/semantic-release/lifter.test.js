@@ -2,7 +2,7 @@ import {promises as fs} from 'node:fs';
 
 import any from '@travi/any';
 import {expect, it, describe, vi} from 'vitest';
-import {when} from 'jest-when';
+import {when} from 'vitest-when';
 
 import {test as workflowsAreUsed, lift as liftGithubWorkflows} from './ci-providers/index.js';
 import lift from './lifter.js';
@@ -14,7 +14,7 @@ describe('semantic-release lifter', () => {
   const projectRoot = any.string();
 
   it('should define the badge', async () => {
-    when(workflowsAreUsed).calledWith({projectRoot}).mockResolvedValue(false);
+    when(workflowsAreUsed).calledWith({projectRoot}).thenResolve(false);
 
     expect(await lift({projectRoot})).toEqual({
       badges: {
@@ -32,8 +32,8 @@ describe('semantic-release lifter', () => {
 
   it('should lift the ci provider when supported', async () => {
     const nodeVersion = `${any.integer()}`;
-    when(fs.readFile).calledWith(`${projectRoot}/.nvmrc`, 'utf-8').mockResolvedValue(nodeVersion);
-    when(workflowsAreUsed).calledWith({projectRoot}).mockResolvedValue(true);
+    when(fs.readFile).calledWith(`${projectRoot}/.nvmrc`, 'utf-8').thenResolve(nodeVersion);
+    when(workflowsAreUsed).calledWith({projectRoot}).thenResolve(true);
 
     await lift({projectRoot});
 

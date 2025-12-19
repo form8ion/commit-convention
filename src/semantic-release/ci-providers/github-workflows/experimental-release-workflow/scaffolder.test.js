@@ -2,7 +2,7 @@ import {writeWorkflowFile} from '@form8ion/github-workflows-core';
 
 import any from '@travi/any';
 import {it, vi, describe, expect} from 'vitest';
-import {when} from 'jest-when';
+import {when} from 'vitest-when';
 
 import {determineAppropriateWorkflow} from '../reusable-release-workflow.js';
 import scaffoldReleaseWorkflow from './scaffolder.js';
@@ -15,7 +15,7 @@ describe('github experimental release workflow scaffolder', () => {
     const projectRoot = any.string();
     const nodeVersion = any.string();
     const reusableReleaseWorkflow = any.string();
-    when(determineAppropriateWorkflow).calledWith(nodeVersion).mockReturnValue(reusableReleaseWorkflow);
+    when(determineAppropriateWorkflow).calledWith(nodeVersion).thenReturn(reusableReleaseWorkflow);
 
     await scaffoldReleaseWorkflow({projectRoot, nodeVersion});
 

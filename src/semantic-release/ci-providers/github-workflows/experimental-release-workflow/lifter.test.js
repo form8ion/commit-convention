@@ -2,7 +2,7 @@ import {loadWorkflowFile, renameWorkflowFile, workflowFileExists} from '@form8io
 
 import any from '@travi/any';
 import {it, describe, vi, expect, beforeEach} from 'vitest';
-import {when} from 'jest-when';
+import {when} from 'vitest-when';
 
 import {determineAppropriateWorkflow} from '../reusable-release-workflow.js';
 import scaffoldWorkflow from './scaffolder.js';
@@ -21,24 +21,24 @@ describe('experimental release workflow lifter', () => {
   const scaffoldResults = any.simpleObject();
 
   beforeEach(() => {
-    when(scaffoldWorkflow).calledWith({projectRoot, nodeVersion}).mockResolvedValue(scaffoldResults);
+    when(scaffoldWorkflow).calledWith({projectRoot, nodeVersion}).thenResolve(scaffoldResults);
     when(determineAppropriateWorkflow)
       .calledWith(nodeVersion)
-      .mockReturnValue(appropriateReusableReleaseWorkflowVersion);
+      .thenReturn(appropriateReusableReleaseWorkflowVersion);
   });
 
   it('should call the scaffolder when the experimental release workflow does not exist', async () => {
-    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(false);
+    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).thenResolve(false);
 
     expect(await lift({projectRoot, nodeVersion})).toEqual(scaffoldResults);
     expect(renameWorkflowFile).not.toHaveBeenCalled();
   });
 
   it('should re-run the scaffolder when the experimental release workflow is dispatchable', async () => {
-    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
+    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).thenResolve(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         on: {workflow_dispatch: {}},
         permissions: {contents: 'read'},
         jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
@@ -49,8 +49,8 @@ describe('experimental release workflow lifter', () => {
   });
 
   it('should re-run the scaffolder when permissions have not been restricted', async () => {
-    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
-    when(loadWorkflowFile).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue({
+    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).thenResolve(true);
+    when(loadWorkflowFile).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).thenResolve({
       on: {},
       jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
     });
@@ -60,10 +60,10 @@ describe('experimental release workflow lifter', () => {
   });
 
   it('should re-run the scaffolder when permissions have not been restricted enough', async () => {
-    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
+    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).thenResolve(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         on: {},
         permissions: any.simpleObject(),
         jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
@@ -74,10 +74,10 @@ describe('experimental release workflow lifter', () => {
   });
 
   it('should re-run the scaffolder when the `contents` permission is not properly restricted', async () => {
-    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
+    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).thenResolve(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         on: {},
         permissions: {contents: 'write'},
         jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
@@ -88,10 +88,10 @@ describe('experimental release workflow lifter', () => {
   });
 
   it('should not re-run the scaffolder when a modern experimental release workflow already exists', async () => {
-    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
+    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).thenResolve(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         on: {},
         permissions: {contents: 'read'},
         jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
@@ -103,10 +103,10 @@ describe('experimental release workflow lifter', () => {
 
   it('should re-run the scaffolder when an inappropriate version of the reusable workflow is referenced', async () => {
     const inappropriateReusableReleaseWorkflowVersion = any.string();
-    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
+    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).thenResolve(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         on: {},
         permissions: {contents: 'read'},
         jobs: {release: {uses: inappropriateReusableReleaseWorkflowVersion}}
@@ -118,14 +118,14 @@ describe('experimental release workflow lifter', () => {
 
   it('should should rename a legacy release workflow to clarify that it is for experimental releases', async () => {
     const legacyReleaseWorkflowName = 'release';
-    when(workflowFileExists).calledWith({projectRoot, name: legacyReleaseWorkflowName}).mockResolvedValue(true);
+    when(workflowFileExists).calledWith({projectRoot, name: legacyReleaseWorkflowName}).thenResolve(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: legacyReleaseWorkflowName})
-      .mockResolvedValue(any.simpleObject());
-    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).mockResolvedValue(true);
+      .thenResolve(any.simpleObject());
+    when(workflowFileExists).calledWith({projectRoot, name: experimentalReleaseWorkflowName}).thenResolve(true);
     when(loadWorkflowFile)
       .calledWith({projectRoot, name: experimentalReleaseWorkflowName})
-      .mockResolvedValue({
+      .thenResolve({
         on: {},
         permissions: {contents: 'read'},
         jobs: {release: {uses: appropriateReusableReleaseWorkflowVersion}}
