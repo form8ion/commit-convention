@@ -1,4 +1,4 @@
-import {loadWorkflowFile, writeWorkflowFile} from '@form8ion/github-workflows-core';
+import {loadWorkflowFile, workflowFileExists, writeWorkflowFile} from '@form8ion/github-workflows-core';
 
 import any from '@travi/any';
 import {it, vi, describe, expect, beforeEach} from 'vitest';
@@ -41,6 +41,7 @@ describe('github-workflows lifter for semantic-release', () => {
 
   beforeEach(() => {
     when(determineAppropriateWorkflow).calledWith(nodeVersion).thenReturn(reusableReleaseWorkflowReference);
+    when(workflowFileExists).calledWith({projectRoot, name: ciWorkflowName}).thenResolve(true);
   });
 
   it('should replace the legacy job', async () => {
@@ -176,5 +177,11 @@ describe('github-workflows lifter for semantic-release', () => {
         jobs: {...jobs, release: modernReleaseJobDefinition}
       }
     });
+  });
+
+  it('should not result in an error if the ci workflow does not exist', async () => {
+    when(workflowFileExists).calledWith({projectRoot, name: ciWorkflowName}).thenResolve(false);
+
+    await lift({projectRoot, nodeVersion});
   });
 });

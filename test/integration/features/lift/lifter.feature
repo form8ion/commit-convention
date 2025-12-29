@@ -59,7 +59,6 @@ Feature: Lift
     When the project is lifted
     Then the release workflow is not defined
 
-  @wip
   Scenario: no node-ci workflow
     Given semantic-release is configured
     And no conventional verification workflow is defined

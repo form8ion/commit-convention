@@ -1,4 +1,4 @@
-import {loadWorkflowFile, writeWorkflowFile} from '@form8ion/github-workflows-core';
+import {loadWorkflowFile, writeWorkflowFile, workflowFileExists} from '@form8ion/github-workflows-core';
 
 import determineTriggerNeedsFrom from './release-trigger-needs.js';
 import {lift as liftReleaseWorkflow} from './experimental-release-workflow/index.js';
@@ -18,6 +18,10 @@ export default async function ({projectRoot, nodeVersion}) {
   const ciWorkflowName = 'node-ci';
 
   await liftReleaseWorkflow({projectRoot, nodeVersion});
+
+  if (!await workflowFileExists({projectRoot, name: ciWorkflowName})) {
+    return;
+  }
 
   const parsedVerificationWorkflowDetails = await loadWorkflowFile({projectRoot, name: ciWorkflowName});
 
