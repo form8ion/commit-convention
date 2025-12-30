@@ -1,4 +1,9 @@
-import {loadWorkflowFile, workflowFileExists, writeWorkflowFile} from '@form8ion/github-workflows-core';
+import {
+  loadWorkflowFile,
+  removeActionFromJobs,
+  workflowFileExists,
+  writeWorkflowFile
+} from '@form8ion/github-workflows-core';
 
 import any from '@travi/any';
 import {it, vi, describe, expect, beforeEach} from 'vitest';
@@ -14,7 +19,8 @@ vi.mock('./release-trigger-needs.js');
 vi.mock('./experimental-release-workflow/index.js');
 vi.mock('./reusable-release-workflow.js');
 
-const ciWorkflowName = 'node-ci';
+const CI_WORKFLOW_NAME = 'node-ci';
+const CYCJIMMY_ACTION_NAME = 'cycjimmy/semantic-release-action';
 
 describe('github-workflows lifter for semantic-release', () => {
   const projectRoot = any.string();
@@ -41,14 +47,15 @@ describe('github-workflows lifter for semantic-release', () => {
 
   beforeEach(() => {
     when(determineAppropriateWorkflow).calledWith(nodeVersion).thenReturn(reusableReleaseWorkflowReference);
-    when(workflowFileExists).calledWith({projectRoot, name: ciWorkflowName}).thenResolve(true);
+    when(workflowFileExists).calledWith({projectRoot, name: CI_WORKFLOW_NAME}).thenResolve(true);
   });
 
   it('should replace the legacy job', async () => {
     const existingJobs = {...jobs, release: legacyReleaseJob};
+    when(removeActionFromJobs).calledWith(existingJobs, CYCJIMMY_ACTION_NAME).thenReturn(existingJobs);
     when(determineTriggerNeedsFrom).calledWith(existingJobs).thenReturn(neededJobsToTriggerRelease);
     when(loadWorkflowFile)
-      .calledWith({projectRoot, name: ciWorkflowName})
+      .calledWith({projectRoot, name: CI_WORKFLOW_NAME})
       .thenResolve({
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'alpha', 'beta', ...moreBranchTriggers]}},
@@ -60,7 +67,7 @@ describe('github-workflows lifter for semantic-release', () => {
     expect(liftReleaseWorkflow).toHaveBeenCalledWith({projectRoot, nodeVersion});
     expect(writeWorkflowFile).toHaveBeenCalledWith({
       projectRoot,
-      name: ciWorkflowName,
+      name: CI_WORKFLOW_NAME,
       config: {
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
@@ -71,9 +78,10 @@ describe('github-workflows lifter for semantic-release', () => {
 
   it('should replace the dispatch job', async () => {
     const existingJobs = {...jobs, release: legacyReleaseJob};
+    when(removeActionFromJobs).calledWith(existingJobs, CYCJIMMY_ACTION_NAME).thenReturn(existingJobs);
     when(determineTriggerNeedsFrom).calledWith(existingJobs).thenReturn(neededJobsToTriggerRelease);
     when(loadWorkflowFile)
-      .calledWith({projectRoot, name: ciWorkflowName})
+      .calledWith({projectRoot, name: CI_WORKFLOW_NAME})
       .thenResolve({
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'alpha', 'beta', ...moreBranchTriggers]}},
@@ -85,7 +93,7 @@ describe('github-workflows lifter for semantic-release', () => {
     expect(liftReleaseWorkflow).toHaveBeenCalledWith({projectRoot, nodeVersion});
     expect(writeWorkflowFile).toHaveBeenCalledWith({
       projectRoot,
-      name: ciWorkflowName,
+      name: CI_WORKFLOW_NAME,
       config: {
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
@@ -96,9 +104,10 @@ describe('github-workflows lifter for semantic-release', () => {
 
   it('should leave a modern job as-is', async () => {
     const existingJobs = {...jobs, release: modernReleaseJobDefinition};
+    when(removeActionFromJobs).calledWith(existingJobs, CYCJIMMY_ACTION_NAME).thenReturn(existingJobs);
     when(determineTriggerNeedsFrom).calledWith(existingJobs).thenReturn(neededJobsToTriggerRelease);
     when(loadWorkflowFile)
-      .calledWith({projectRoot, name: ciWorkflowName})
+      .calledWith({projectRoot, name: CI_WORKFLOW_NAME})
       .thenResolve({
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
@@ -109,7 +118,7 @@ describe('github-workflows lifter for semantic-release', () => {
 
     expect(writeWorkflowFile).toHaveBeenCalledWith({
       projectRoot,
-      name: ciWorkflowName,
+      name: CI_WORKFLOW_NAME,
       config: {
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
@@ -130,9 +139,15 @@ describe('github-workflows lifter for semantic-release', () => {
         ]
       }
     };
+    when(removeActionFromJobs)
+      .calledWith(existingJobs, CYCJIMMY_ACTION_NAME)
+      .thenReturn({
+        ...jobs,
+        [jobNameContainingCycjimmyAction]: {steps: otherStepsInJobContainingCycJimmyAction}
+      });
     when(determineTriggerNeedsFrom).calledWith(existingJobs).thenReturn(neededJobsToTriggerRelease);
     when(loadWorkflowFile)
-      .calledWith({projectRoot, name: ciWorkflowName})
+      .calledWith({projectRoot, name: CI_WORKFLOW_NAME})
       .thenResolve({
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'alpha', 'beta', ...moreBranchTriggers]}},
@@ -143,7 +158,7 @@ describe('github-workflows lifter for semantic-release', () => {
 
     expect(writeWorkflowFile).toHaveBeenCalledWith({
       projectRoot,
-      name: ciWorkflowName,
+      name: CI_WORKFLOW_NAME,
       config: {
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
@@ -157,9 +172,10 @@ describe('github-workflows lifter for semantic-release', () => {
   });
 
   it('should add the release trigger when no release is configured yet', async () => {
+    when(removeActionFromJobs).calledWith(jobs, CYCJIMMY_ACTION_NAME).thenReturn(jobs);
     when(determineTriggerNeedsFrom).calledWith(jobs).thenReturn(neededJobsToTriggerRelease);
     when(loadWorkflowFile)
-      .calledWith({projectRoot, name: ciWorkflowName})
+      .calledWith({projectRoot, name: CI_WORKFLOW_NAME})
       .thenResolve({
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, ...moreBranchTriggers]}},
@@ -170,7 +186,7 @@ describe('github-workflows lifter for semantic-release', () => {
 
     expect(writeWorkflowFile).toHaveBeenCalledWith({
       projectRoot,
-      name: ciWorkflowName,
+      name: CI_WORKFLOW_NAME,
       config: {
         ...verificationWorkflowDetails,
         on: {push: {branches: [...branchTriggers, ...moreBranchTriggers, 'beta']}},
@@ -180,7 +196,7 @@ describe('github-workflows lifter for semantic-release', () => {
   });
 
   it('should not result in an error if the ci workflow does not exist', async () => {
-    when(workflowFileExists).calledWith({projectRoot, name: ciWorkflowName}).thenResolve(false);
+    when(workflowFileExists).calledWith({projectRoot, name: CI_WORKFLOW_NAME}).thenResolve(false);
 
     await lift({projectRoot, nodeVersion});
   });

@@ -1,17 +1,16 @@
-import {loadWorkflowFile, writeWorkflowFile, workflowFileExists} from '@form8ion/github-workflows-core';
+import {
+  loadWorkflowFile,
+  writeWorkflowFile,
+  workflowFileExists,
+  removeActionFromJobs
+} from '@form8ion/github-workflows-core';
 
 import determineTriggerNeedsFrom from './release-trigger-needs.js';
 import {lift as liftReleaseWorkflow} from './experimental-release-workflow/index.js';
 import {determineAppropriateWorkflow} from './reusable-release-workflow.js';
 
-function removeCycjimmyActionFrom(otherJobs) {
-  return Object.fromEntries(Object.entries(otherJobs).map(([jobName, job]) => [
-    jobName,
-    {
-      ...job,
-      ...job.steps && {steps: job.steps.filter(step => !step.uses?.includes('cycjimmy/semantic-release-action'))}
-    }
-  ]));
+function removeCycjimmyActionFrom(jobs) {
+  return removeActionFromJobs(jobs, 'cycjimmy/semantic-release-action');
 }
 
 export default async function ({projectRoot, nodeVersion}) {
