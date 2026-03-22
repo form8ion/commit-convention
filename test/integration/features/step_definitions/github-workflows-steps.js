@@ -85,6 +85,17 @@ Given('no conventional verification workflow is defined', async function () {
   this.verificationWorkflow = false;
 });
 
+Given('the workflow-result job does not yet depend on the release job', async function () {
+  this.nodeCiWithWorkflowResultJob = true;
+  this.workflowResultNeedsReleaseJob = false;
+});
+
+Given('the workflow-result job already depends on the release job', async function () {
+  this.nodeCiWithWorkflowResultJob = true;
+  this.workflowResultNeedsReleaseJob = true;
+  this.workflowResultHasDuplicateReleaseNeeds = true;
+});
+
 Then('the experimental release workflow calls the reusable workflow for alpha branches', async function () {
   const {triggers, jobs} = await loadReleaseWorkflowDefinition({projectRoot: this.projectRoot});
 
@@ -187,4 +198,18 @@ Then('the cycjimmy action was removed', async function () {
   );
 
   assert.notInclude(ciWorkflow, 'cycjimmy');
+});
+
+Then('the workflow-result job depends on the release job', async function () {
+  const verificationWorkflowDefinition = await loadWorkflowFile({projectRoot: this.projectRoot, name: ciWorkflowName});
+
+  assert.include(verificationWorkflowDefinition.jobs['workflow-result'].needs, 'release');
+});
+
+Then('the workflow-result job depends on the release job only once', async function () {
+  const verificationWorkflowDefinition = await loadWorkflowFile({projectRoot: this.projectRoot, name: ciWorkflowName});
+  const releaseDependencies = verificationWorkflowDefinition.jobs['workflow-result'].needs
+    .filter(jobName => 'release' === jobName);
+
+  assert.lengthOf(releaseDependencies, 1);
 });

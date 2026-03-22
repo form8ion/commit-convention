@@ -200,4 +200,76 @@ describe('github-workflows lifter for semantic-release', () => {
 
     await lift({projectRoot, nodeVersion});
   });
+
+  it('should add release as a workflow-result dependency when missing', async () => {
+    const workflowResultJob = {steps: any.listOf(any.simpleObject), needs: ['verify']};
+    const existingJobs = {...jobs, 'workflow-result': workflowResultJob};
+
+    when(removeActionFromJobs).calledWith(existingJobs, CYCJIMMY_ACTION_NAME).thenReturn(existingJobs);
+    when(determineTriggerNeedsFrom).calledWith(existingJobs).thenReturn(neededJobsToTriggerRelease);
+    when(loadWorkflowFile)
+      .calledWith({projectRoot, name: CI_WORKFLOW_NAME})
+      .thenResolve({
+        ...verificationWorkflowDetails,
+        on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
+        jobs: existingJobs
+      });
+
+    await lift({projectRoot, nodeVersion});
+
+    expect(writeWorkflowFile).toHaveBeenCalledWith({
+      projectRoot,
+      name: CI_WORKFLOW_NAME,
+      config: {
+        ...verificationWorkflowDetails,
+        on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
+        jobs: {
+          ...jobs,
+          release: modernReleaseJobDefinition,
+          'workflow-result': {...workflowResultJob, needs: ['verify', 'release']}
+        }
+      }
+    });
+
+    const [writeCall] = writeWorkflowFile.mock.calls;
+
+    expect(Object.keys(writeCall[0].config.jobs).at(-1)).toEqual('workflow-result');
+    expect(Object.keys(writeCall[0].config.jobs['workflow-result'])).toEqual(['steps', 'needs']);
+  });
+
+  it('should only keep one release workflow-result dependency when already present', async () => {
+    const workflowResultJob = {steps: any.listOf(any.simpleObject), needs: ['verify', 'release', 'release']};
+    const existingJobs = {...jobs, 'workflow-result': workflowResultJob};
+
+    when(removeActionFromJobs).calledWith(existingJobs, CYCJIMMY_ACTION_NAME).thenReturn(existingJobs);
+    when(determineTriggerNeedsFrom).calledWith(existingJobs).thenReturn(neededJobsToTriggerRelease);
+    when(loadWorkflowFile)
+      .calledWith({projectRoot, name: CI_WORKFLOW_NAME})
+      .thenResolve({
+        ...verificationWorkflowDetails,
+        on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
+        jobs: existingJobs
+      });
+
+    await lift({projectRoot, nodeVersion});
+
+    expect(writeWorkflowFile).toHaveBeenCalledWith({
+      projectRoot,
+      name: CI_WORKFLOW_NAME,
+      config: {
+        ...verificationWorkflowDetails,
+        on: {push: {branches: [...branchTriggers, 'beta', ...moreBranchTriggers]}},
+        jobs: {
+          ...jobs,
+          release: modernReleaseJobDefinition,
+          'workflow-result': {...workflowResultJob, needs: ['verify', 'release']}
+        }
+      }
+    });
+
+    const [writeCall] = writeWorkflowFile.mock.calls;
+
+    expect(Object.keys(writeCall[0].config.jobs).at(-1)).toEqual('workflow-result');
+    expect(Object.keys(writeCall[0].config.jobs['workflow-result'])).toEqual(['steps', 'needs']);
+  });
 });

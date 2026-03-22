@@ -64,3 +64,17 @@ Feature: Lift
     And no conventional verification workflow is defined
     When the project is lifted
     Then no error occurs
+
+  Scenario: release job is not yet a dependency of the workflow-result job
+    Given semantic-release is configured
+    And the release workflow is called from the ci workflow
+    And the workflow-result job does not yet depend on the release job
+    When the project is lifted
+    Then the workflow-result job depends on the release job
+
+  Scenario: release job is already a dependency of the workflow-result job
+    Given semantic-release is configured
+    And the release workflow is called from the ci workflow
+    And the workflow-result job already depends on the release job
+    When the project is lifted
+    Then the workflow-result job depends on the release job only once

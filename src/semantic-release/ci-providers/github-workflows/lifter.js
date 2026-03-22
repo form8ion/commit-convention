@@ -13,6 +13,24 @@ function removeCycjimmyActionFrom(jobs) {
   return removeActionFromJobs(jobs, 'cycjimmy/semantic-release-action');
 }
 
+function addReleaseAsWorkflowResultDependency({jobs}) {
+  if (!jobs['workflow-result']) return {jobsWithoutWorkflowResult: jobs};
+
+  const {'workflow-result': workflowResultJob, ...jobsWithoutWorkflowResult} = jobs;
+  const workflowResultNeeds = [workflowResultJob.needs].flat().filter(Boolean);
+  const updatedWorkflowResultNeeds = [...new Set([...workflowResultNeeds, 'release'])];
+  const workflowResultJobWithUpdatedNeeds = Object.fromEntries(
+    Object.entries(workflowResultJob).map(
+      ([property, value]) => [property, 'needs' === property ? updatedWorkflowResultNeeds : value]
+    )
+  );
+
+  return {
+    jobsWithoutWorkflowResult,
+    workflowResultJob: workflowResultJobWithUpdatedNeeds
+  };
+}
+
 export default async function ({projectRoot, nodeVersion}) {
   const ciWorkflowName = 'node-ci';
 
@@ -30,9 +48,12 @@ export default async function ({projectRoot, nodeVersion}) {
   ];
 
   const {'trigger-release': triggerRelease, ...otherJobs} = parsedVerificationWorkflowDetails.jobs;
+  const {jobsWithoutWorkflowResult, workflowResultJob} = addReleaseAsWorkflowResultDependency({
+    jobs: removeCycjimmyActionFrom(otherJobs)
+  });
 
   parsedVerificationWorkflowDetails.jobs = {
-    ...removeCycjimmyActionFrom(otherJobs),
+    ...jobsWithoutWorkflowResult,
     release: {
       needs: determineTriggerNeedsFrom(otherJobs),
       permissions: {
@@ -44,7 +65,8 @@ export default async function ({projectRoot, nodeVersion}) {
       uses: determineAppropriateWorkflow(nodeVersion),
       // eslint-disable-next-line no-template-curly-in-string
       secrets: {NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'}
-    }
+    },
+    ...workflowResultJob && {'workflow-result': workflowResultJob}
   };
 
   await writeWorkflowFile({

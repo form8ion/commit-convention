@@ -1,4 +1,4 @@
-import {resolve, dirname} from 'node:path';
+import {dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {dump} from 'js-yaml';
 
@@ -50,6 +50,16 @@ When('the project is lifted', async function () {
               jobs: {
                 verify: {steps: []},
                 ...this.multipleNodeVersionsVerified && {'verify-matrix': {steps: []}},
+                ...this.nodeCiWithWorkflowResultJob && {
+                  'workflow-result': {
+                    needs: [
+                      'verify',
+                      ...this.workflowResultNeedsReleaseJob ? ['release'] : [],
+                      ...this.workflowResultHasDuplicateReleaseNeeds ? ['release'] : []
+                    ],
+                    steps: []
+                  }
+                },
                 ...this.nodeCiWithReleaseJob && {release: {steps: []}},
                 ...this.nodeCiWithCycjimmyAction && {
                   [any.word()]: {
