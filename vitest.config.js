@@ -7,9 +7,9 @@ export default defineConfig({
     mockReset: true,
 
     coverage: {
-      provider: "v8",
-      include: ["src/**"],
-      exclude: ["src/**/index.js"]
+      provider: 'v8',
+      include: ['src/**'],
+      exclude: ['src/**/index.js']
     }
   }
 });
