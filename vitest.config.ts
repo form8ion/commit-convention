@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     globals: true,
     restoreMocks: true,
+    mockReset: true,
 
     coverage: {
       provider: "v8",
