@@ -2,7 +2,7 @@ import {promises as fs} from 'node:fs';
 
 import {test as ciProviderCanBeLifted, lift as liftCiProvider} from './ci-providers/index.js';
 
-export default async function ({projectRoot}) {
+export default async function liftSemanticRelease({projectRoot}) {
   if (await ciProviderCanBeLifted({projectRoot})) {
     const nodeVersion = await fs.readFile(`${projectRoot}/.nvmrc`, 'utf-8');
 

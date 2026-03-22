@@ -1,7 +1,7 @@
 import {fileTypes} from '@form8ion/core';
 import {write} from '@form8ion/config-file';
 
-export default async function ({config, projectRoot}) {
+export default async function scaffoldCommitlint({config, projectRoot}) {
   await write({
     format: fileTypes.JSON,
     name: 'commitlint',

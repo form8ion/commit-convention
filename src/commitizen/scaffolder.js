@@ -1,6 +1,6 @@
 import {promises as fs} from 'node:fs';
 
-export default async function ({projectRoot}) {
+export default async function scaffoldCommitizen({projectRoot}) {
   await fs.writeFile(
     `${projectRoot}/.czrc`,
     JSON.stringify({path: './node_modules/cz-conventional-changelog'})

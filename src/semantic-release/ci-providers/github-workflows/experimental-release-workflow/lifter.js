@@ -40,7 +40,7 @@ async function renameLegacyReleaseWorkflow(projectRoot, experimentalReleaseWorkf
   }
 }
 
-export default async function ({projectRoot, nodeVersion}) {
+export default async function liftExperimentalReleaseWorkflow({projectRoot, nodeVersion}) {
   const experimentalReleaseWorkflowName = 'experimental-release';
 
   await renameLegacyReleaseWorkflow(projectRoot, experimentalReleaseWorkflowName);

@@ -4,7 +4,7 @@ import {fileExists} from '@form8ion/core';
 
 import scaffoldCommitlint from './scaffolder.js';
 
-export default async function ({projectRoot, configs}) {
+export default async function liftCommitlint({projectRoot, configs}) {
   if (await fileExists(`${projectRoot}/.commitlintrc.js`)) {
     await fs.unlink(`${projectRoot}/.commitlintrc.js`);
 

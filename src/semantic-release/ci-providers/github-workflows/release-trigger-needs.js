@@ -1,4 +1,4 @@
-export default function (jobs) {
+export default function determineReleaseTriggerNeeds(jobs) {
   const jobNames = Object.keys(jobs);
 
   return [

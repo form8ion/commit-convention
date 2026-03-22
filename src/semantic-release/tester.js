@@ -1,6 +1,6 @@
 import {promises as fs} from 'node:fs';
 
-export default async function ({projectRoot}) {
+export default async function semanticReleaseInUse({projectRoot}) {
   // use loader from js-core once upgraded
   const {version} = JSON.parse(await fs.readFile(`${projectRoot}/package.json`, 'utf-8'));
 

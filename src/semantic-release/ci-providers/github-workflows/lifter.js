@@ -31,7 +31,7 @@ function addReleaseAsWorkflowResultDependency({jobs}) {
   };
 }
 
-export default async function ({projectRoot, nodeVersion}) {
+export default async function liftWorkflows({projectRoot, nodeVersion}) {
   const ciWorkflowName = 'node-ci';
 
   await liftReleaseWorkflow({projectRoot, nodeVersion});

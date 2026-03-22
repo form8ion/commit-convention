@@ -2,7 +2,7 @@ import {writeWorkflowFile} from '@form8ion/github-workflows-core';
 
 import {determineAppropriateWorkflow} from '../reusable-release-workflow.js';
 
-export default async function ({projectRoot, nodeVersion}) {
+export default async function scaffoldExperimentalReleaseWorkflow({projectRoot, nodeVersion}) {
   await writeWorkflowFile({
     projectRoot,
     name: 'experimental-release',

@@ -1,6 +1,6 @@
 import {fileExists} from '@form8ion/core';
 
-export default function ({projectRoot}) {
+export default function commitlintInUse({projectRoot}) {
   return ['json', 'js', 'cjs']
     .reduce(
       async (acc, extension) => await acc || fileExists(`${projectRoot}/.commitlintrc.${extension}`),

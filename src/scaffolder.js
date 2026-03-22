@@ -5,7 +5,7 @@ import {scaffold as scaffoldSemanticRelease} from './semantic-release/index.js';
 import {scaffold as scaffoldCommitizen} from './commitizen/index.js';
 import {scaffold as scaffoldCommitlint} from './commitlint/index.js';
 
-export default async function ({projectRoot, projectType, configs, pathWithinParent}) {
+export default async function scaffoldCommitConvention({projectRoot, projectType, configs, pathWithinParent}) {
   const detailsForProjectsPublishedToARegistry = [projectTypes.PACKAGE, projectTypes.CLI].includes(projectType)
     ? await scaffoldSemanticRelease({projectRoot})
     : {};
