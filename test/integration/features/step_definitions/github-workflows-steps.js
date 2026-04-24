@@ -101,7 +101,7 @@ Then('the experimental release workflow calls the reusable workflow for alpha br
 
   assert.isUndefined(triggers.workflow_dispatch);
   assert.deepEqual(triggers.push.branches, ['alpha']);
-  assert.equal(jobs.release.uses, 'form8ion/.github/.github/workflows/release-package.yml@master');
+  assert.equal(jobs.release.uses, 'form8ion/semantic-release-workflow/.github/workflows/release.yml@v2.0.0');
 });
 
 Then('the legacy experimental release workflow has been renamed', async function () {
@@ -151,7 +151,7 @@ Then('the verification workflow calls the reusable release workflow', async func
     }
   );
 
-  assert.equal(releaseJob.uses, 'form8ion/.github/.github/workflows/release-package.yml@master');
+  assert.equal(releaseJob.uses, 'form8ion/semantic-release-workflow/.github/workflows/release.yml@v2.0.0');
   // eslint-disable-next-line no-template-curly-in-string
   assert.equal(releaseJob.secrets.NPM_TOKEN, '${{ secrets.NPM_PUBLISH_TOKEN }}');
 });

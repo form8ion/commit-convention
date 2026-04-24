@@ -5,11 +5,13 @@ import {determineAppropriateWorkflow} from './reusable-release-workflow.js';
 
 describe('reusable release workflow', () => {
   it('should use the latest semantic-release version for the lowest supported node version', async () => {
-    expect(determineAppropriateWorkflow('20')).toEqual('form8ion/.github/.github/workflows/release-package.yml@master');
+    expect(determineAppropriateWorkflow('20'))
+      .toEqual('form8ion/semantic-release-workflow/.github/workflows/release.yml@v2.0.0');
   });
 
   it('should use the latest semantic-release version for a higher node version', async () => {
-    expect(determineAppropriateWorkflow('22')).toEqual('form8ion/.github/.github/workflows/release-package.yml@master');
+    expect(determineAppropriateWorkflow('22'))
+      .toEqual('form8ion/semantic-release-workflow/.github/workflows/release.yml@v2.0.0');
   });
 
   it('should use semantic-release v18 for lower than node v20', async () => {
