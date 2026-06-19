@@ -15,16 +15,18 @@ describe('lifter', () => {
     const projectRoot = any.string();
     const configs = any.simpleObject();
     const enhancerResults = any.simpleObject();
+    const dependencies = any.simpleObject();
     when(applyEnhancers)
       .calledWith({
         options: {projectRoot, configs},
         enhancers: {
           'semantic-release': semanticReleasePlugin,
           commitlint: commitlintPlugin
-        }
+        },
+        dependencies
       })
       .thenResolve(enhancerResults);
 
-    expect(await lift({projectRoot, configs})).toEqual(enhancerResults);
+    expect(await lift({projectRoot, configs}, dependencies)).toEqual(enhancerResults);
   });
 });

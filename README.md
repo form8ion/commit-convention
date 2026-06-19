@@ -52,11 +52,17 @@ import {scaffold, test, lift} from '@form8ion/commit-convention';
 ```javascript
 (async () => {
   const projectRoot = process.cwd();
+  const logger = {
+    info: () => undefined,
+    success: () => undefined,
+    warn: () => undefined,
+    error: () => undefined
+  };
 
   await scaffold({projectRoot, configs: {}});
 
   if (await test({projectRoot})) {
-    await lift({projectRoot, packageManager: packageManagers.NPM});
+    await lift({projectRoot, packageManager: packageManagers.NPM}, {logger});
   }
 })();
 ```

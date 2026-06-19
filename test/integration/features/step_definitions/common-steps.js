@@ -1,6 +1,7 @@
 import {dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {dump} from 'js-yaml';
+import createDebugFor from 'debug';
 
 import {After, Before, Then, When} from '@cucumber/cucumber';
 import stubbedFs from 'mock-fs';
@@ -8,6 +9,13 @@ import any from '@travi/any';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));          // eslint-disable-line no-underscore-dangle
 const stubbedNodeModules = stubbedFs.load(resolve(__dirname, '..', '..', '..', '..', 'node_modules'));
+const debug = createDebugFor('test:common-steps');
+const logger = {
+  success: debug,
+  info: debug,
+  warn: debug,
+  error: debug
+};
 
 Before(function () {
   this.projectRoot = process.cwd();
@@ -115,7 +123,10 @@ When('the project is lifted', async function () {
   });
 
   if (await test({projectRoot: this.projectRoot})) {
-    await lift({projectRoot: this.projectRoot, configs: {commitlint: {name: this.commilintConfigName}}});
+    await lift(
+      {projectRoot: this.projectRoot, configs: {commitlint: {name: this.commilintConfigName}}},
+      {logger}
+    );
   }
 });
 

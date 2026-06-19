@@ -11,10 +11,16 @@ stubbedFs({'package.json': JSON.stringify({version: '0.0.0-semantically-released
 
 (async () => {
   const projectRoot = process.cwd();
+  const logger = {
+    info: () => undefined,
+    success: () => undefined,
+    warn: () => undefined,
+    error: () => undefined
+  };
 
   await scaffold({projectRoot, configs: {}});
 
   if (await test({projectRoot})) {
-    await lift({projectRoot, packageManager: packageManagers.NPM});
+    await lift({projectRoot, packageManager: packageManagers.NPM}, {logger});
   }
 })();
