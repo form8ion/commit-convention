@@ -124,7 +124,7 @@ $ npm test
 
 [coverage-link]: https://codecov.io/github/form8ion/commit-convention
 
-[coverage-badge]: https://img.shields.io/codecov/c/github/form8ion/commit-convention?logo=codecov
+[coverage-badge]: https://img.shields.io/codecov/c/github/form8ion/commit-convention/master?logo=codecov
 
 [node-badge]: https://img.shields.io/node/v/@form8ion/commit-convention?logo=node.js
 
