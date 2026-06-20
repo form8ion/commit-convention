@@ -109,7 +109,7 @@ Given('a legacy release workflow is defined', async function () {
   // this.alphaReleaseWorkflow = true;
 });
 
-Given('the release workflow is triggered from the ci workflow', async function () {
+Given('the release workflow is triggered from the GitHub workflow', async function () {
   await writeWorkflowFile({
     projectRoot: this.projectRoot,
     name: 'node-ci',
@@ -130,7 +130,7 @@ Given('the release workflow is triggered from the ci workflow', async function (
   });
 });
 
-Given('the release workflow is called from the ci workflow', async function () {
+Given('the release workflow is called from the GitHub workflow', async function () {
   await createGithubWorkflowsDirectory(this.projectRoot);
   await writeWorkflowFile({
     projectRoot: this.projectRoot,

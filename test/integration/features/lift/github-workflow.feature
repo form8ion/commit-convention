@@ -17,14 +17,14 @@ Feature: Lift GitHub Workflow
 
   Scenario: modern semantic-release in GitHub workflows
     Given semantic-release is configured
-    And the release workflow is called from the ci workflow
+    And the release workflow is called from the GitHub workflow
     And an experimental release workflow is defined
     When the project is lifted
     Then the experimental release workflow calls the reusable workflow for alpha branches
 
   Scenario: modern semantic-release in GitHub workflows, but trigger does not wait for verification
     Given semantic-release is configured
-    And the release workflow is called from the ci workflow
+    And the release workflow is called from the GitHub workflow
     And an experimental release workflow is defined
     When the project is lifted
     Then the experimental release workflow calls the reusable workflow for alpha branches
@@ -32,7 +32,7 @@ Feature: Lift GitHub Workflow
 
   Scenario: modern semantic-release in GitHub workflows verifying multiple node versions, but trigger does not wait for verification
     Given semantic-release is configured
-    And the release workflow is called from the ci workflow
+    And the release workflow is called from the GitHub workflow
     And an experimental release workflow is defined
     And multiple node versions are verified
     When the project is lifted
@@ -67,14 +67,14 @@ Feature: Lift GitHub Workflow
 
   Scenario: release job is not yet a dependency of the workflow-result job
     Given semantic-release is configured
-    And the release workflow is called from the ci workflow
+    And the release workflow is called from the GitHub workflow
     And the workflow-result job does not yet depend on the release job
     When the project is lifted
     Then the workflow-result job depends on the release job
 
   Scenario: release job is already a dependency of the workflow-result job
     Given semantic-release is configured
-    And the release workflow is called from the ci workflow
+    And the release workflow is called from the GitHub workflow
     And the workflow-result job already depends on the release job
     When the project is lifted
     Then the workflow-result job depends on the release job only once
