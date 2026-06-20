@@ -3,9 +3,10 @@ import {fileExists} from '@form8ion/core';
 
 import {Given, Then, When} from '@cucumber/cucumber';
 import {assert} from 'chai';
+import any from '@travi/any';
 
 Given('commitlint is configured with a {string} extension', async function (configExtension) {
-  this.commitlintConfigExtension = configExtension;
+  await fs.writeFile(`${this.projectRoot}/.commitlintrc.${configExtension}`, JSON.stringify(any.simpleObject()));
 });
 
 When('commitlint will be configured', async function () {

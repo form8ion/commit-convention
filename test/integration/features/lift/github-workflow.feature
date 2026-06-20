@@ -1,4 +1,4 @@
-Feature: Lift
+Feature: Lift GitHub Workflow
 
   Scenario: legacy semantic-release in a GitHub workflow
     Given semantic-release is configured

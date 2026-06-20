@@ -1,8 +1,10 @@
-import {promises as fs} from 'fs';
-import {loadWorkflowFile, workflowFileExists} from '@form8ion/github-workflows-core';
+import {promises as fs} from 'node:fs';
+import {dump, load} from 'js-yaml';
+import {loadWorkflowFile, workflowFileExists, writeWorkflowFile} from '@form8ion/github-workflows-core';
 
 import {Given, Then} from '@cucumber/cucumber';
 import {assert} from 'chai';
+import any from '@travi/any';
 
 const experimentalReleaseWorkflowName = 'experimental-release';
 const legacyReleaseWorkflowName = 'release';
@@ -19,81 +21,210 @@ async function loadReleaseWorkflowDefinition({projectRoot}) {
   return {triggers, jobs};
 }
 
+async function createGithubWorkflowsDirectory(projectRoot) {
+  await fs.mkdir(`${projectRoot}/.github/workflows`, {recursive: true});
+}
+
 Given('legacy releases are configured in a GitHub workflow', async function () {
-  this.githubWorkflows = true;
-  this.verificationWorkflow = true;
-  this.nodeCiWithReleaseJob = true;
-  this.alphaBranchTrigger = true;
-  this.betaBranchTrigger = true;
+  await createGithubWorkflowsDirectory(this.projectRoot);
+  await writeWorkflowFile({
+    projectRoot: this.projectRoot,
+    name: 'node-ci',
+    config: {
+      on: {
+        push: {
+          branches: [
+            'master',
+            'alpha',
+            'beta',
+            'dependency-updater/**'
+          ]
+        }
+      },
+      jobs: {
+        verify: {steps: []},
+        release: {steps: []}
+      }
+    }
+  });
 });
 
 Given('the cycjimmy action is configured in a GitHub workflow', async function () {
-  this.githubWorkflows = true;
-  this.verificationWorkflow = true;
-  this.nodeCiWithCycjimmyAction = true;
+  await createGithubWorkflowsDirectory(this.projectRoot);
+  await writeWorkflowFile({
+    projectRoot: this.projectRoot,
+    name: 'node-ci',
+    config: {
+      on: {
+        push: {
+          branches: [
+            'master',
+            'dependency-updater/**'
+          ]
+        }
+      },
+      jobs: {
+        verify: {steps: []},
+        [any.word()]: {
+          steps: [{
+            name: 'semantic-release',
+            uses: 'cycjimmy/semantic-release-action@v2',
+            env: {
+              // eslint-disable-next-line no-template-curly-in-string
+              GITHUB_TOKEN: '${{ secrets.GH_TOKEN }}',
+              // eslint-disable-next-line no-template-curly-in-string
+              NPM_TOKEN: '${{ secrets.NPM_PUBLISH_TOKEN }}'
+            }
+          }]
+        }
+      }
+    }
+  });
 });
 
 Given('a local release workflow is defined', async function () {
-  this.githubWorkflows = true;
-  this.legacyReleaseWorkflow = true;
-  this.localReleaseWorkflow = true;
+  await createGithubWorkflowsDirectory(this.projectRoot);
+  await writeWorkflowFile({
+    projectRoot: this.projectRoot,
+    name: 'release',
+    config: {on: {push: {branches: ['alpha']}, workflow_dispatch: {}}}
+  });
 });
 
 Given('an experimental release workflow is defined', async function () {
-  this.githubWorkflows = true;
-  this.experimentalReleaseWorkflow = true;
-  this.alphaReleaseWorkflow = true;
+  // this.alphaReleaseWorkflow = true;
+  await writeWorkflowFile({
+    projectRoot: this.projectRoot,
+    name: 'experimental-release',
+    config: {
+      on: {push: {branches: ['alpha']}},
+      jobs: {release: {uses: 'form8ion/.github/.github/workflows/release-package.yml@master'}}
+    }
+  });
 });
 
 Given('a legacy release workflow is defined', async function () {
-  this.githubWorkflows = true;
-  this.legacyReleaseWorkflow = true;
-  this.alphaReleaseWorkflow = true;
+  // this.githubWorkflows = true;
+  // this.legacyReleaseWorkflow = true;
+  // this.alphaReleaseWorkflow = true;
 });
 
 Given('the release workflow is triggered from the ci workflow', async function () {
-  this.githubWorkflows = true;
-  this.verificationWorkflow = true;
-  this.nodeCiWithTriggerReleaseJob = true;
+  await writeWorkflowFile({
+    projectRoot: this.projectRoot,
+    name: 'node-ci',
+    config: {
+      on: {
+        push: {
+          branches: [
+            'master',
+            'dependency-updater/**'
+          ]
+        }
+      },
+      jobs: {
+        verify: {steps: []},
+        'trigger-release': {steps: []}
+      }
+    }
+  });
 });
 
 Given('the release workflow is called from the ci workflow', async function () {
-  this.githubWorkflows = true;
-  this.verificationWorkflow = true;
-  this.nodeCiWithCallReleaseJob = true;
+  await createGithubWorkflowsDirectory(this.projectRoot);
+  await writeWorkflowFile({
+    projectRoot: this.projectRoot,
+    name: 'node-ci',
+    config: {
+      on: {
+        push: {
+          branches: [
+            'master',
+            'dependency-updater/**'
+          ]
+        }
+      },
+      jobs: {
+        verify: {steps: []},
+        release: {uses: 'form8ion/.github/.github/workflows/release-package.yml@master'}
+      }
+    }
+  });
 });
 
 Given('no release is configured in a GitHub workflow', async function () {
-  this.githubWorkflows = true;
-  this.verificationWorkflow = true;
-  this.nodeCiWithReleaseJob = false;
-  this.nodeCiWithTriggerReleaseJob = false;
-  this.alphaBranchTrigger = false;
-  this.betaBranchTrigger = false;
+  await createGithubWorkflowsDirectory(this.projectRoot);
+  await writeWorkflowFile({
+    projectRoot: this.projectRoot,
+    name: 'node-ci',
+    config: {
+      on: {
+        push: {
+          branches: [
+            'master',
+            'dependency-updater/**'
+          ]
+        }
+      },
+      jobs: {
+        verify: {steps: []}
+      }
+    }
+  });
 });
 
 Given('multiple node versions are verified', async function () {
-  this.multipleNodeVersionsVerified = true;
+  const nodeCiWorkflowPath = `${this.projectRoot}/.github/workflows/node-ci.yml`;
+
+  const nodeCiContents = load(await fs.readFile(nodeCiWorkflowPath, 'utf-8'));
+  await fs.writeFile(
+    nodeCiWorkflowPath,
+    dump({
+      ...nodeCiContents,
+      jobs: {
+        ...nodeCiContents.jobs,
+        'verify-matrix': {steps: []},
+        'workflow-result': {...any.simpleObject(), needs: ['verify', 'release', 'release']}
+      }
+    })
+  );
 });
 
 Given('no GitHub workflows exist', async function () {
-  this.githubWorkflows = false;
+  return undefined;
 });
 
 Given('no conventional verification workflow is defined', async function () {
-  this.githubWorkflows = true;
-  this.verificationWorkflow = false;
+  return undefined;
 });
 
 Given('the workflow-result job does not yet depend on the release job', async function () {
-  this.nodeCiWithWorkflowResultJob = true;
-  this.workflowResultNeedsReleaseJob = false;
+  const nodeCiWorkflowPath = `${this.projectRoot}/.github/workflows/node-ci.yml`;
+
+  const nodeCiContents = load(await fs.readFile(nodeCiWorkflowPath, 'utf-8'));
+  await fs.writeFile(
+    nodeCiWorkflowPath,
+    dump({
+      ...nodeCiContents,
+      jobs: {...nodeCiContents.jobs, 'workflow-result': {...any.simpleObject(), needs: ['verify']}}
+    })
+  );
 });
 
 Given('the workflow-result job already depends on the release job', async function () {
-  this.nodeCiWithWorkflowResultJob = true;
-  this.workflowResultNeedsReleaseJob = true;
-  this.workflowResultHasDuplicateReleaseNeeds = true;
+  const nodeCiWorkflowPath = `${this.projectRoot}/.github/workflows/node-ci.yml`;
+
+  const nodeCiContents = load(await fs.readFile(nodeCiWorkflowPath, 'utf-8'));
+  await fs.writeFile(
+    nodeCiWorkflowPath,
+    dump({
+      ...nodeCiContents,
+      jobs: {
+        ...nodeCiContents.jobs,
+        'workflow-result': {...any.simpleObject(), needs: ['verify', 'release', 'release']}
+      }
+    })
+  );
 });
 
 Then('the experimental release workflow calls the reusable workflow for alpha branches', async function () {
